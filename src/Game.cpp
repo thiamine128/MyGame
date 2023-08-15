@@ -1,4 +1,4 @@
-#include <Game.h>
+#include "Game.h"
 
 #include <GLFW/glfw3.h>
 
