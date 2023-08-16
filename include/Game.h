@@ -1,17 +1,22 @@
 #pragma once
 
 #include "Window.h"
-#include "GameRenderer.h"
+#include "rendering/GameRenderer.h"
 
 class Game
 {
 public:
-    Game();
     ~Game();
 
+    void init();
     void run();
     void processInput() const;
+
+    static Game* getInstance();
+    static void terminate();
 protected:
-    Window* window;
     GameRenderer* renderer;
+    Game();
+
+    static Game* instance;
 };

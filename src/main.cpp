@@ -4,8 +4,8 @@
 
 int main()
 {
-    Game* game = new Game();
-    game->run();
-    delete game;
+    Game::getInstance()->init();
+    Game::getInstance()->run();
+    Game::terminate();
     return 0;
 }

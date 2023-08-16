@@ -48,7 +48,7 @@ endif
 INCLUDES	:= $(patsubst %,-I%, $(INCLUDEDIRS:%/=%))
 
 # define the C libs
-LIBS		:= $(patsubst %,-L%, $(LIBDIRS:%/=%)) -lglad -lglfw3dll
+LIBS		:= $(patsubst %,-L%, $(LIBDIRS:%/=%)) -lglad -lglfw3dll -lassimp.dll
 
 # define the C source files
 SOURCES		:= $(wildcard $(patsubst %,%/*.cpp, $(SOURCEDIRS)))

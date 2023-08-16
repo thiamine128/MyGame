@@ -1,4 +1,4 @@
-#include "VertexBufferObject.h"
+#include "rendering/VertexBufferObject.h"
 
 #include <glad/glad.h>
 

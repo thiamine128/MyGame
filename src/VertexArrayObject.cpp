@@ -1,4 +1,4 @@
-#include "VertexArrayObject.h"
+#include "rendering/VertexArrayObject.h"
 
 VertexArrayObject::VertexArrayObject()
 {

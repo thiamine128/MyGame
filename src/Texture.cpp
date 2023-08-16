@@ -1,10 +1,24 @@
-#include "Texture.h"
+#include "rendering/Texture.h"
 
 #include <stb_image.h>
 
 #include <iostream>
 
-Texture::Texture(const char* path)
+Texture::Texture()
+{
+}
+
+Texture::Texture(const char *path)
+{
+    this->loadImage(path);
+}
+
+Texture::~Texture()
+{
+    glDeleteTextures(1, &(this->id));
+}
+
+void Texture::loadImage(const char* path)
 {
     unsigned char* data = stbi_load(path, &(this->width), &(this->height), &(this->nrChannels), STBI_rgb);
 
@@ -27,12 +41,12 @@ Texture::Texture(const char* path)
     stbi_image_free(data);
 }
 
-Texture::~Texture()
-{
-    glDeleteTextures(1, &(this->id));
-}
-
 void Texture::bind() const
 {
     glBindTexture(GL_TEXTURE_2D, this->id);
+}
+
+int Texture::getWidth() const
+{
+    return this->width;
 }

@@ -1,84 +1,64 @@
-#include "GameRenderer.h"
+#include "rendering/GameRenderer.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
 
-#include "Shader.h"
-#include "Texture.h"
-#include "VertexBufferObject.h"
-#include "VertexArrayObject.h"
-#include "ElementBufferObject.h"
+#include "Window.h"
+#include "rendering/Shader.h"
+#include "rendering/Model.h"
+#include "rendering/Texture.h"
 
 Shader* shader;
-VertexBufferObject* vbo;
-VertexArrayObject* vao;
-ElementBufferObject* ebo;
-Texture* texture;
+Model* mmodel;
 
-float vertices[] =
-{
-    0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f,
-    0.5f, -0.5, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-    -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-    -0.5f, 0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f
-};
-
-unsigned int indices[] =
-{
-    0, 1, 3,
-    1, 2, 3
-};
 GameRenderer::GameRenderer()
 {
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         std::cout << "Failed to load glad." << std::endl;
     }
 
+    glEnable(GL_DEPTH_TEST);
+
+    this->camera = new Camera();
+
     shader = new Shader("assets/shader/default.vsh", "assets/shader/default.fsh");
-    vbo = new VertexBufferObject();
-    ebo = new ElementBufferObject();
-    vao = new VertexArrayObject();
-    vao->bind();
 
-    vbo->bind();
-    vbo->bufferDataStatic(sizeof(vertices), vertices);
-
-    ebo->bind();
-    ebo->bufferDataStatic(sizeof(indices), indices);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*) (6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-
-    vbo->unbind();
-    vao->unbind();
-
-    texture = new Texture("assets/test.png");
+    mmodel = new Model("assets/model/stickman.obj");
 }
 
 GameRenderer::~GameRenderer()
 {
-    delete vbo;
-    delete ebo;
-    delete vao;
-    delete texture;
+    
 }
 
 void GameRenderer::render() const
 {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(0.2f, 0.2f, 0.6f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     shader->use();
-    vao->bind();
-    texture->bind();
+    
 
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 view = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
+    //model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    view = camera->getView();
+    projection = glm::perspective(glm::radians(45.0f), (float) Window::getInstance()->getWidth() / (float) Window::getInstance()->getHeight(), 0.1f, 100.0f);
+
+    shader->setMat4("model", model);
+    shader->setMat4("view", view);
+    shader->setMat4("projection", projection);
+
+    mmodel->render(shader);
+}
+
+Camera *GameRenderer::getCamera() const
+{
+    return this->camera;
 }

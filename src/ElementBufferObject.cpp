@@ -1,4 +1,4 @@
-#include "ElementBufferObject.h"
+#include "rendering/ElementBufferObject.h"
 
 #include <glad/glad.h>
 

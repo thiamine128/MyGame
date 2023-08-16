@@ -5,7 +5,13 @@
 
 #include <iostream>
 
-Window::Window(int width, int height, const char* title)
+Window* Window::instance = nullptr;
+
+Window::Window() {
+
+}
+
+void Window::init(int width, int height, const char* title)
 {
     this->width = width;
     this->height = height;
@@ -57,7 +63,37 @@ int Window::getKey(int key) const {
     return glfwGetKey(this->window, key);
 }
 
+void Window::onResize(int width, int height)
+{
+    this->width = width;
+    this->height = height;
+}
+
+int Window::getWidth() const
+{
+    return this->width;
+}
+
+int Window::getHeight() const
+{
+    return this->height;
+}
+
+Window *Window::getInstance()
+{
+    if (instance == nullptr) {
+        instance = new Window();
+    }
+    return instance;
+}
+
+void Window::terminate()
+{
+    delete instance;
+}
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+    Window::getInstance()->onResize(width, height);
 }

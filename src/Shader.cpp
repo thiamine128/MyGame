@@ -1,4 +1,4 @@
-#include "Shader.h"
+#include "rendering/Shader.h"
 
 #include <string>
 #include <sstream>
@@ -93,4 +93,9 @@ void Shader::use() const
 void Shader::setInt(const char* name, int value) const
 {
     glUniform1i(glGetUniformLocation(this->id, name), value);
+}
+
+void Shader::setMat4(const char* name, glm::mat4& value) const
+{
+    glUniformMatrix4fv(glGetUniformLocation(this->id, name), 1, GL_FALSE, glm::value_ptr(value));
 }
