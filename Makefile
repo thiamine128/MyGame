@@ -21,16 +21,20 @@ OUTPUT	:= output
 SRC		:= src
 
 # define include directory
-INCLUDE	:= include
+INCLUDE	:= include src
 
 # define lib directory
 LIB		:= lib
+
+
+OBJ     := obj
 
 ifeq ($(OS),Windows_NT)
 MAIN	:= main.exe
 SOURCEDIRS	:= $(SRC)
 INCLUDEDIRS	:= $(INCLUDE)
 LIBDIRS		:= $(LIB)
+OBJDIRS     := $(OBJ)
 FIXPATH = $(subst /,\,$1)
 RM			:= del /q /f
 MD	:= mkdir
@@ -50,11 +54,13 @@ INCLUDES	:= $(patsubst %,-I%, $(INCLUDEDIRS:%/=%))
 # define the C libs
 LIBS		:= $(patsubst %,-L%, $(LIBDIRS:%/=%)) -lglad -lglfw3dll -lassimp.dll
 
+rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
+
 # define the C source files
-SOURCES		:= $(wildcard $(patsubst %,%/*.cpp, $(SOURCEDIRS)))
+SOURCES		:= $(call rwildcard, $(SOURCEDIRS), *.cpp)
 
 # define the C object files
-OBJECTS		:= $(SOURCES:.cpp=.o)
+OBJECTS     := $(patsubst $(SOURCEDIRS)/%.cpp, $(OBJDIRS)/%.o, $(SOURCES))
 
 # define the dependency output files
 DEPS		:= $(OBJECTS:.o=.d)
@@ -84,8 +90,18 @@ $(MAIN): $(OBJECTS)
 # the rule(a .c file) and $@: the name of the target of the rule (a .o file)
 # -MMD generates dependency output files same name as the .o file
 # (see the gnu make manual section about automatic variables)
-.cpp.o:
+#.cpp.o:
+#	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -MMD $<  -o $@
+ifeq ($(OS),Windows_NT)
+$(OBJDIRS)/%.o: $(SOURCEDIRS)/%.cpp
+	if not exist "$(@D)" $(MD) "$(@D)"
 	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -MMD $<  -o $@
+else
+$(OBJDIRS)/%.o: $(SOURCEDIRS)/%.cpp
+	$(MD) $(@D)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c -MMD $<  -o $@
+endif
+	
 
 .PHONY: clean
 clean:
