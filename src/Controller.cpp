@@ -1,7 +1,10 @@
 #include "Controller.h"
 
 #include "Window.h"
+#include "Game.h"
 #include <GLFW/glfw3.h>
+
+#include <iostream>
 
 Controller::Controller()
 {
@@ -29,4 +32,11 @@ glm::vec3 Controller::getVelocity()
 bool Controller::isKeyPressed(int key) const
 {
     return Window::getInstance()->getKey(key) == GLFW_PRESS;
+}
+
+void Controller::onPress(int key) const
+{
+    if (key == GLFW_KEY_E) {
+        Game::getInstance()->getWorld()->getPlayer()->plow();
+    }
 }

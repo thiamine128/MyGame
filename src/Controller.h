@@ -10,4 +10,5 @@ public:
 
     glm::vec3 getVelocity();
     bool isKeyPressed(int) const;
+    void onPress(int) const;
 };

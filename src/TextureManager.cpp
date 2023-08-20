@@ -3,6 +3,7 @@
 #include <stb_image.h>
 
 std::unordered_map<std::string, Texture*> TextureManager::entries;
+TextureAtlas* TextureManager::tiles;
 
 Texture const* TextureManager::getTexture(std::string const& path)
 {
@@ -13,9 +14,15 @@ Texture const* TextureManager::getTexture(std::string const& path)
     return entries[path];
 }
 
+void TextureManager::initAtlas()
+{
+    tiles = new TextureAtlas("assets/texture/tiles.png", "assets/texture/tiles.atlas");
+}
+
 void TextureManager::terminate()
 {
     for (auto e : entries) {
         delete e.second;
     }
+    delete tiles;
 }

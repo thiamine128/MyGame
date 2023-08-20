@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "version": "0.6.7"
+  },
+  "savePath": "",
+  "images": [
+    {
+      "name": "ground.png",
+      "path": "D:/MyProject/MyGame/texture/ground.png",
+      "folder": ""
+    },
+    {
+      "name": "plowland.png",
+      "path": "D:/MyProject/MyGame/texture/plowland.png",
+      "folder": ""
+    }
+  ],
+  "folders": [],
+  "packOptions": {
+    "textureName": "texture",
+    "textureFormat": "png",
+    "removeFileExtension": true,
+    "prependFolderName": true,
+    "base64Export": false,
+    "tinify": false,
+    "tinifyKey": "",
+    "scale": 1,
+    "filter": "none",
+    "exporter": "custom",
+    "fileName": "pack-result",
+    "savePath": "",
+    "width": 2048,
+    "height": 2048,
+    "fixedSize": false,
+    "powerOfTwo": false,
+    "padding": 0,
+    "extrude": 0,
+    "allowRotation": true,
+    "allowTrim": true,
+    "trimMode": "trim",
+    "alphaThreshold": "0",
+    "detectIdentical": true,
+    "packer": "MaxRectsBin",
+    "packerMethod": "BestShortSideFit"
+  }
+}

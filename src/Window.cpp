@@ -1,6 +1,7 @@
 #include "Window.h"
 
 #include "Game.h"
+#include "Controller.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -34,6 +35,7 @@ void Window::init(int width, int height, const char* title)
 
     glfwMakeContextCurrent(this->window);
     glfwSetFramebufferSizeCallback(this->window, framebufferSizeCallback);
+    glfwSetKeyCallback(this->window, keyCallback);
 }
 
 Window::~Window()
@@ -81,6 +83,11 @@ int Window::getHeight() const
     return this->height;
 }
 
+GLFWwindow *Window::getWindow() const
+{
+    return this->window;
+}
+
 Window *Window::getInstance()
 {
     if (instance == nullptr) {
@@ -98,5 +105,13 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
     Window::getInstance()->onResize(width, height);
-    Game::getInstance()->getGameRenderer()->updateProjectionMatrix();
+    Game::getInstance()->getGameRenderer()->updateProjection();
+}
+
+void keyCallback(GLFWwindow* window, int key, int code, int action, int mods)
+{
+    if (action == GLFW_PRESS)
+    {
+        Game::getInstance()->getController()->onPress(key);
+    }
 }

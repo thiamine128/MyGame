@@ -12,7 +12,10 @@ public:
     void loadImage(const char*);
     void bind() const;
     int getWidth() const;
+    void attachToFramebuffer(GLenum) const;
+    void setupDepthMap(int, int) const;
 protected:
+    
     int width, height, nrChannels;
     GLuint id;
 };

@@ -21,7 +21,7 @@ OUTPUT	:= output
 SRC		:= src
 
 # define include directory
-INCLUDE	:= include src
+INCLUDE	:= include src src/imgui
 
 # define lib directory
 LIB		:= lib

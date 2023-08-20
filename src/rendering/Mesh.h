@@ -1,21 +1,32 @@
 #pragma once
 
-#include "Vertex.h"
-#include "Texture.h"
-#include "Shader.h"
-#include "VertexArrayObject.h"
-#include "VertexBufferObject.h"
-#include "ElementBufferObject.h"
+class Vertex;
+class Texture;
+class Shader;
+class VertexArrayObject;
+class VertexBufferObject;
+class ElementBufferObject;
+
 
 #include <vector>
 
 class Mesh
 {
 public:
+    Mesh(const Texture* texture);
+    Mesh();
     Mesh(std::vector<Vertex>&, std::vector<unsigned int>&, std::vector<Texture const*>&);
     ~Mesh();
 
     void render(const Shader*) const;
+    void renderInstanced(const Shader*, int) const;
+    void render() const;
+
+    void quad(Vertex&, Vertex&, Vertex&, Vertex&);
+    void merge(const Mesh*);
+    void clear();
+    void build() const;
+    void setupInstancing(VertexBufferObject*) const;
 protected:
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;

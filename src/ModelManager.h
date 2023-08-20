@@ -1,8 +1,9 @@
 #pragma once
 
-#include "rendering/Model.h"
+class Model;
 
 #include <unordered_map>
+#include <string>
 
 class ModelManager
 {

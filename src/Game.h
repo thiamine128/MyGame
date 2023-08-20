@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Window.h"
 #include "world/World.h"
-#include "rendering/GameRenderer.h"
 #include "Controller.h"
+#include "rendering/GameRenderer.h"
 
 class Game
 {
@@ -28,6 +27,9 @@ protected:
     GameRenderer* renderer;
     Controller* controller;
     float currentFrame, lastFrame, deltaTime;
+    float fpsLastTime;
+    int frameCnt;
+    int fps;
     
     Game();
 

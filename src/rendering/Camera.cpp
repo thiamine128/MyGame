@@ -1,5 +1,7 @@
 #include "Camera.h"
 
+#include "world/Player.h"
+
 Camera::Camera()
 {
     this->pos = glm::vec3(0.0f, 8.0f, -8.0f);
@@ -32,6 +34,16 @@ void Camera::update(Player* player)
     this->pos = player->getPosFrame() + glm::vec3(0.0, 8.0, -8.0);
     this->center = player->getPosFrame();
     this->view = glm::lookAt(pos, center, up);
+}
+
+glm::vec3 Camera::getPos() const
+{
+    return this->pos;
+}
+
+glm::vec3 Camera::getCenter() const
+{
+    return this->center;
 }
 
 glm::mat4 const& Camera::getView() const

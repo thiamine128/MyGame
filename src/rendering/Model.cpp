@@ -1,6 +1,8 @@
 #include "Model.h"
 
+#include "Vertex.h"
 #include "TextureManager.h"
+#include "Mesh.h"
 
 #include <iostream>
 
@@ -23,6 +25,11 @@ void Model::render(const Shader* shader) const
     for (unsigned int i = 0; i < this->meshes.size(); ++i) {
         this->meshes[i]->render(shader);
     }
+}
+
+const Mesh* Model::getMesh(int ind) const
+{
+    return this->meshes[ind];
 }
 
 void Model::load(std::string const& path)
@@ -59,10 +66,7 @@ Mesh* Model::processMesh(aiMesh* mesh, const aiScene* scene)
     std::vector<Texture const*> textures;
 
     for (unsigned int i = 0; i < mesh->mNumVertices; ++i) {
-        Vertex vertex;
-        vertex.position.x = mesh->mVertices[i].x;
-        vertex.position.y = mesh->mVertices[i].y;
-        vertex.position.z = mesh->mVertices[i].z;
+        Vertex vertex(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 
         if (mesh->HasNormals())
         {

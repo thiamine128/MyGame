@@ -3,6 +3,7 @@
 class GLFWwindow;
 
 void framebufferSizeCallback(GLFWwindow*, int, int);
+void keyCallback(GLFWwindow*, int, int, int, int);
 
 class Window
 {
@@ -18,6 +19,7 @@ public:
     void onResize(int, int);
     int getWidth() const;
     int getHeight() const;
+    GLFWwindow* getWindow() const;
 
     static Window* getInstance();
     static void terminate();

@@ -6,10 +6,12 @@
 
 Texture::Texture()
 {
+    glGenTextures(1, &(this->id));
 }
 
 Texture::Texture(const char *path)
 {
+    glGenTextures(1, &(this->id));
     this->loadImage(path);
 }
 
@@ -23,7 +25,7 @@ void Texture::loadImage(const char* path)
     unsigned char* data = stbi_load(path, &(this->width), &(this->height), &(this->nrChannels), STBI_rgb);
 
     if (data) {
-        glGenTextures(1, &(this->id));
+        
         this->bind();
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -49,4 +51,18 @@ void Texture::bind() const
 int Texture::getWidth() const
 {
     return this->width;
+}
+
+void Texture::attachToFramebuffer(GLenum attachment) const
+{
+    glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, this->id, 0);
+}
+
+void Texture::setupDepthMap(int width, int height) const
+{
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }

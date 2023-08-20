@@ -1,9 +1,18 @@
 #pragma once
 
-#include "Camera.h"
-#include "Model.h"
-#include "world/World.h"
-#include "rendering/construction/ConstructionRendererDispatcher.h"
+class Camera;
+class Model;
+class World;
+class FramebufferObject;
+
+#include "rendering/Shader.h"
+#include "rendering/Texture.h"
+#include "world/Player.h"
+#include "world/crop/Crop.h"
+#include "InstancedRenderer.h"
+
+#include <unordered_map>
+#include <glm/gtc/type_ptr.hpp>
 
 class GameRenderer
 {
@@ -11,18 +20,26 @@ public:
     GameRenderer();
     ~GameRenderer();
 
-    void render() const;
-    void renderGround() const;
+    void render();
     Camera* getCamera() const;
-    void renderPlayer(Player*) const;
-    void renderWorld(World*) const;
-    void updateProjectionMatrix();
-    void setupViewProjection(const Shader*) const;
+    void renderToDepthMap();
+    void renderDefault();
+    void renderWorld(World*, const Shader*) const;
+    void renderChunks(World*, const Shader*) const;
+    void updateProjection();
+    void initShadowMap();
+    glm::vec3 getSunPosition() const;
+
+    glm::mat4 getView() const;
+    glm::mat4 getLightSpace() const;
+    glm::mat4 getProjection() const;
 protected:
     Camera* camera;
     const Model* groundModel;
-    const Model* playerModel;
     const Shader* defaultShader;
-    ConstructionRendererDispatcher* constructionRendererDispatcher;
     glm::mat4 projection;
+    glm::mat4 lightProjection;
+    FramebufferObject* depthMapFramebuffer;
+    Texture* depthMap;
+    int shadowWidth, shadowHeight;
 };

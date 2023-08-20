@@ -4,7 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "world/Player.h"
+class Player;
 
 class Camera
 {
@@ -17,7 +17,10 @@ public:
     void setCenter(glm::vec3&);
     void setUp(glm::vec3&);
     void update(Player*);
+    glm::vec3 getPos() const;
+    glm::vec3 getCenter() const;
 protected:
     glm::vec3 pos, center, up;
     glm::mat4 view;
+    glm::mat4 projection;
 };

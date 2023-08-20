@@ -1,5 +1,6 @@
 #include "ModelManager.h"
 
+#include "rendering/Model.h"
 
 std::unordered_map<std::string, Model*> ModelManager::entries;
 

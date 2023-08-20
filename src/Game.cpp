@@ -3,8 +3,16 @@
 #include "TextureManager.h"
 #include "ModelManager.h"
 #include "ShaderManager.h"
+#include "Window.h"
+#include "world/World.h"
+#include "rendering/GameRenderer.h"
+#include "Controller.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 #include <GLFW/glfw3.h>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
 
@@ -22,6 +30,16 @@ Game::~Game() {
 
 void Game::init() {
     Window::getInstance()->init(800, 600, "My Game");
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+    ImGui_ImplGlfw_InitForOpenGL(Window::getInstance()->getWindow(), true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
+
     this->renderer = new GameRenderer();
     this->world = new World();
     this->controller = new Controller();
@@ -29,10 +47,24 @@ void Game::init() {
 }
 
 void Game::run() {
+    this->frameCnt = this->fps = 0;
     while (!Window::getInstance()->shouldClose()) {
         this->currentFrame = static_cast<float>(glfwGetTime());
         this->deltaTime += currentFrame - lastFrame;
         this->lastFrame = currentFrame;
+
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ++frameCnt;
+        if (this->currentFrame - this->fpsLastTime >= 1.0) {
+            
+            this->fps = this->frameCnt;
+            this->fpsLastTime = this->currentFrame;
+            this->frameCnt = 0;
+        }
+
         this->processInput();
 
         while (deltaTime > this->tickRate) {
@@ -40,8 +72,20 @@ void Game::run() {
             this->world->tick();
         }
 
+        ImGui::Begin("Debug");
+        ImGui::Text("FPS: %d", this->fps);
+        if (ImGui::Button("nextDay"))
+        {
+            this->world->nextDay();
+        }
+        ImGui::End();
+        
         this->renderer->render();
 
+        
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         Window::getInstance()->swapBuffers();
         Window::getInstance()->pollEvents();
     }
@@ -90,5 +134,8 @@ void Game::terminate()
     TextureManager::terminate();
     ModelManager::terminate();
     ShaderManager::terminate();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
     delete instance;
 }

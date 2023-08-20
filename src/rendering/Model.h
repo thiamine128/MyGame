@@ -1,12 +1,15 @@
 #pragma once
 
-#include "Shader.h"
-#include "Mesh.h"
+class Shader;
+class Mesh;
+class Texture;
+
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include <string>
 #include <vector>
 
 class Model
@@ -16,6 +19,7 @@ public:
     ~Model();
 
     void render(const Shader*) const;
+    const Mesh* getMesh(int) const;
 protected:
     std::vector<Mesh*> meshes;
     std::string dir;
