@@ -38,5 +38,6 @@ float calcShadow(vec4 pos) {
 
 void main()
 {
-    FragColor = texture(texture0, TexCoord) * calcShadow(PosLightSpace);
+    FragColor = vec4(1.0);
+    FragColor.rgb = texture(texture0, TexCoord).rgb * calcShadow(PosLightSpace);
 }

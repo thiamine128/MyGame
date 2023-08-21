@@ -16,6 +16,7 @@ public:
     static const Shader* getLine();
     static const Shader* getGui();
     static const Shader* getGuiModel();
+    static const Shader* getText();
     static void setupUniforms(const GameRenderer*);
     static void initUniforms(const GameRenderer*, const GUI*);
 protected:
@@ -25,4 +26,5 @@ protected:
     static Shader* lineShader;
     static Shader* guiShader;
     static Shader* guiModelShader;
+    static Shader* textShader;
 };

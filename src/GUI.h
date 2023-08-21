@@ -5,8 +5,20 @@
 #include "rendering/VertexBufferObject.h"
 #include "rendering/ElementBufferObject.h"
 #include "world/item/Inventory.h"
+
 class Model;
+
 #include <glm/gtc/type_ptr.hpp>
+
+#include <unordered_map>
+
+struct Character
+{
+    Texture* texture;
+    glm::ivec2 size;
+    glm::ivec2 bearing;
+    unsigned int advance;
+};
 
 class GUI
 {
@@ -19,6 +31,7 @@ public:
     void renderGuiModel(int, int, int, const Model*);
     void renderSlotItems(Inventory*);
     void updateViewport();
+    void renderText(float, float, float, std::string const&);
     glm::vec2 const& getViewport() const;
     glm::mat4 const& getProjection() const;
 protected:
@@ -28,4 +41,8 @@ protected:
     const Texture* slotTexture;
     glm::vec2 viewport;
     glm::mat4 projection;
+    std::unordered_map<char, Character> characters;
+
+    void setupRect();
+    void initFont();
 };

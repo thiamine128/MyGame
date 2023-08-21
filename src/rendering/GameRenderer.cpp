@@ -61,7 +61,6 @@ GameRenderer::~GameRenderer()
 
 void GameRenderer::render()
 {
-    glEnable(GL_CULL_FACE);
     Player* player = Game::getInstance()->getWorld()->getPlayer();
 
     this->camera->update(player);
