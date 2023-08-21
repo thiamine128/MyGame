@@ -120,3 +120,8 @@ AABB Player::getAABB(glm::vec3 const& pos) const
 {
     return AABB(pos - glm::vec3(0.5, 0.0, 0.5), pos + glm::vec3(0.5, 2.0, 0.5));
 }
+
+Inventory* Player::getInventory()
+{
+    return &(this->inventory);
+}

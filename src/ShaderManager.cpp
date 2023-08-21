@@ -2,11 +2,14 @@
 
 #include "rendering/GameRenderer.h"
 #include "rendering/Camera.h"
+#include "GUI.h"
 
 Shader* ShaderManager::defaultShader = nullptr;
 Shader* ShaderManager::instanceDefaultShader = nullptr;
 Shader* ShaderManager::shadowShader = nullptr;
 Shader* ShaderManager::lineShader = nullptr;
+Shader* ShaderManager::guiShader = nullptr;
+Shader* ShaderManager::guiModelShader = nullptr;
 
 void ShaderManager::load()
 {
@@ -14,6 +17,8 @@ void ShaderManager::load()
     instanceDefaultShader = new Shader("assets/shader/instance_default.vsh", "assets/shader/instance_default.fsh");
     shadowShader = new Shader("assets/shader/shadow.vsh", "assets/shader/shadow.fsh");
     lineShader = new Shader("assets/shader/line.vsh", "assets/shader/line.fsh");
+    guiShader = new Shader("assets/shader/gui.vsh", "assets/shader/gui.fsh");
+    guiModelShader = new Shader("assets/shader/gui_model.vsh", "assets/shader/gui_model.fsh");
 }
 
 void ShaderManager::terminate()
@@ -41,6 +46,16 @@ const Shader *ShaderManager::getLine()
     return lineShader;
 }
 
+const Shader *ShaderManager::getGui()
+{
+    return guiShader;
+}
+
+const Shader *ShaderManager::getGuiModel()
+{
+    return guiModelShader;
+}
+
 void ShaderManager::setupUniforms(const GameRenderer* renderer)
 {
     defaultShader->use();
@@ -57,7 +72,7 @@ void ShaderManager::setupUniforms(const GameRenderer* renderer)
     shadowShader->setMat4("lightSpace", renderer->getLightSpace());
 }
 
-void ShaderManager::initUniforms(const GameRenderer* renderer)
+void ShaderManager::initUniforms(const GameRenderer* renderer, const GUI* gui)
 {
     defaultShader->use();
     defaultShader->setInt("shadowMap", 1);
@@ -67,4 +82,8 @@ void ShaderManager::initUniforms(const GameRenderer* renderer)
     instanceDefaultShader->setMat4("projection", renderer->getProjection());
     lineShader->use();
     lineShader->setMat4("projection", renderer->getProjection());
+    guiShader->use();
+    guiShader->setVec2("viewport", gui->getViewport());
+    guiModelShader->use();
+    guiModelShader->setMat4("projection", gui->getProjection());
 }

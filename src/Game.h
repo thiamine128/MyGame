@@ -3,6 +3,7 @@
 #include "world/World.h"
 #include "Controller.h"
 #include "rendering/GameRenderer.h"
+#include "GUI.h"
 
 class Game
 {
@@ -17,6 +18,7 @@ public:
     GameRenderer* getGameRenderer() const;
     Controller* getController() const;
     World* getWorld() const;
+    GUI* getGui() const;
     float getDeltaTime() const;
     float getFrameTime() const;
 
@@ -24,6 +26,7 @@ public:
     static void terminate();
 protected:
     World* world;
+    GUI* gui;
     GameRenderer* renderer;
     Controller* controller;
     float currentFrame, lastFrame, deltaTime;

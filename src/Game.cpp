@@ -44,6 +44,9 @@ void Game::init() {
     this->world = new World();
     this->controller = new Controller();
     this->currentFrame = this->lastFrame = this->deltaTime = 0.0f;
+    this->gui = new GUI();
+
+    ShaderManager::initUniforms(this->renderer, this->gui);
 }
 
 void Game::run() {
@@ -85,6 +88,8 @@ void Game::run() {
         
         this->renderer->render();
 
+        this->gui->render();
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         Window::getInstance()->swapBuffers();
@@ -110,6 +115,11 @@ Controller *Game::getController() const
 World *Game::getWorld() const
 {
     return this->world;
+}
+
+GUI *Game::getGui() const
+{
+    return this->gui;
 }
 
 float Game::getDeltaTime() const

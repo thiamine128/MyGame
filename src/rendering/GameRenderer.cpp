@@ -29,7 +29,6 @@ GameRenderer::GameRenderer()
     }
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
 
     this->camera = new Camera();
     
@@ -62,6 +61,7 @@ GameRenderer::~GameRenderer()
 
 void GameRenderer::render()
 {
+    glEnable(GL_CULL_FACE);
     Player* player = Game::getInstance()->getWorld()->getPlayer();
 
     this->camera->update(player);
@@ -73,8 +73,6 @@ void GameRenderer::render()
     
     glViewport(0, 0, Window::getInstance()->getWidth(), Window::getInstance()->getHeight());
     this->renderDefault();
-
-    this->renderGui();
 }
 
 Camera* GameRenderer::getCamera() const
@@ -164,8 +162,6 @@ void GameRenderer::renderChunks(World* world, const Shader* shader, bool shadow)
 void GameRenderer::updateProjection()
 {
     this->projection = glm::perspective(glm::radians(45.0f), (float) Window::getInstance()->getWidth() / (float) Window::getInstance()->getHeight(), 0.1f, 100.0f);
-    
-    ShaderManager::initUniforms(this);
 }
 
 void GameRenderer::initShadowMap()
@@ -222,11 +218,6 @@ void GameRenderer::renderAABB(AABB const& aabb) const
     ShaderManager::getLine()->use();
     glLineWidth(2.0f);
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
-}
-
-void GameRenderer::renderGui() const
-{
-    
 }
 
 glm::vec3 GameRenderer::getSunPosition() const

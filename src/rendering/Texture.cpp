@@ -53,6 +53,11 @@ int Texture::getWidth() const
     return this->width;
 }
 
+int Texture::getHeight() const
+{
+    return this->height;
+}
+
 void Texture::attachToFramebuffer(GLenum attachment) const
 {
     glFramebufferTexture2D(GL_FRAMEBUFFER, attachment, GL_TEXTURE_2D, this->id, 0);

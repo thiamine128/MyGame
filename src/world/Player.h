@@ -24,6 +24,7 @@ public:
     ItemStack const& getSlot(int) const;
     AABB getAABB() const;
     AABB getAABB(glm::vec3 const&) const;
+    Inventory* getInventory();
 protected:
     glm::vec3 pos;
     glm::vec3 prevPos;

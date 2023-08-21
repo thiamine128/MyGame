@@ -31,7 +31,6 @@ public:
     void updateProjection();
     void initShadowMap();
     void renderAABB(AABB const&) const;
-    void renderGui() const;
 
     glm::vec3 getSunPosition() const;
     glm::mat4 getView() const;

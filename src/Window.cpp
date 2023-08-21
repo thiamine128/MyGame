@@ -2,6 +2,7 @@
 
 #include "Game.h"
 #include "Controller.h"
+#include "ShaderManager.h"
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -106,6 +107,8 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
     Window::getInstance()->onResize(width, height);
     Game::getInstance()->getGameRenderer()->updateProjection();
+    Game::getInstance()->getGui()->updateViewport();
+    ShaderManager::initUniforms(Game::getInstance()->getGameRenderer(), Game::getInstance()->getGui());
 }
 
 void keyCallback(GLFWwindow* window, int key, int code, int action, int mods)

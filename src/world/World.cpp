@@ -156,7 +156,7 @@ void World::getNearbyChunks(glm::vec2 pos, std::vector<Chunk*>& list) const
 
 void World::setupHouse()
 {
-    this->house = new House(glm::vec3(8.0, 0.0001, 8.0));
+    this->house = new House(glm::vec3(8.0, -0.001, 8.0));
 
     for (int i = 4; i < 12; ++i)
     {

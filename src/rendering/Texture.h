@@ -12,6 +12,7 @@ public:
     void loadImage(const char*);
     void bind() const;
     int getWidth() const;
+    int getHeight() const;
     void attachToFramebuffer(GLenum) const;
     void setupDepthMap(int, int) const;
 protected:
