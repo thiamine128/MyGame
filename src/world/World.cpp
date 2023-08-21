@@ -1,28 +1,38 @@
 #include "World.h"
 
-#include "world/construction/Tree.h"
 #include "Game.h"
+#include "building/House.h"
 
 World::World()
 {
+    for (int i = 0; i < CHUNK_NUM; ++i)
+    {
+        for (int j = 0; j < CHUNK_NUM; ++j)
+        {
+            this->chunks[i][j] = new Chunk(glm::ivec2(i - CHUNK_NUM / 2, j - CHUNK_NUM / 2));
+        }
+    }
     this->player = new Player(this);
-    this->generateTrees();
+    
+    this->setupHouse();
 }
 
 World::~World()
 {
     delete this->player;
+    delete this->house;
+    for (int i = 0; i < CHUNK_NUM; ++i)
+    {
+        for (int j = 0; j < CHUNK_NUM; ++j)
+        {
+            delete this->chunks[i][j];
+        }
+    }
 }
 
 void World::generateTrees()
 {
-    for (int i = 0; i < 5; ++i)
-        this->constructions.push_back(new Tree(glm::vec3(0.0, 0.0, i * 3.0)));
-}
-
-std::vector<Construction*> &World::getConstructions()
-{
-    return this->constructions;
+    
 }
 
 Player *World::getPlayer() const
@@ -46,7 +56,7 @@ TileType World::getTile(int x, int y) const
      x %= 16, y %= 16;
     if (x < 0) x += 16;
     if (y < 0) y += 16;
-    return chunks[chunkInd.x][chunkInd.y].getTile(x, y);
+    return chunks[chunkInd.x][chunkInd.y]->getTile(x, y);
 }
 
 #include <iostream>
@@ -57,10 +67,10 @@ void World::setTile(int x, int y, TileType type)
     x %= 16, y %= 16;
     if (x < 0) x += 16;
     if (y < 0) y += 16;
-    chunks[chunkInd.x][chunkInd.y].setTile(x, y, type);
+    chunks[chunkInd.x][chunkInd.y]->setTile(x, y, type);
 }
 
-Chunk& World::getChunk(int x, int y)
+Chunk* World::getChunk(int x, int y) const
 {
     return this->chunks[x + CHUNK_NUM / 2][y + CHUNK_NUM / 2];
 }
@@ -77,7 +87,7 @@ void World::sow(int x, int y, CropProperties* crop)
     x %= 16, y %= 16;
     if (x < 0) x += 16;
     if (y < 0) y += 16;
-    chunks[chunkInd.x][chunkInd.y].sow(x, y, crop);
+    chunks[chunkInd.x][chunkInd.y]->sow(x, y, crop);
 }
 
 void World::harvest(int x, int y)
@@ -86,7 +96,16 @@ void World::harvest(int x, int y)
     x %= 16, y %= 16;
     if (x < 0) x += 16;
     if (y < 0) y += 16;
-    chunks[chunkInd.x][chunkInd.y].harvest(x, y);
+    chunks[chunkInd.x][chunkInd.y]->harvest(x, y);
+}
+
+void World::buildConstruction(int x, int y, Construction* construction)
+{
+    glm::ivec2 chunkInd = getChunkPos(x, y) + CHUNK_NUM / 2;
+    x %= 16, y %= 16;
+    if (x < 0) x += 16;
+    if (y < 0) y += 16;
+    chunks[chunkInd.x][chunkInd.y]->buildConstruction(x, y, construction);
 }
 
 const Crop *World::getCrop(int x, int y) const
@@ -95,7 +114,7 @@ const Crop *World::getCrop(int x, int y) const
     x %= 16, y %= 16;
     if (x < 0) x += 16;
     if (y < 0) y += 16;
-    return chunks[chunkInd.x][chunkInd.y].getCrop(x, y);
+    return chunks[chunkInd.x][chunkInd.y]->getCrop(x, y);
 }
 
 void World::nextDay()
@@ -106,7 +125,47 @@ void World::nextDay()
     {
         for (int j = 0; j < CHUNK_NUM; ++j)
         {
-            this->chunks[i][j].nextDay();
+            this->chunks[i][j]->nextDay();
         }
     }
+}
+
+void World::addBuilding(Building* building)
+{
+    glm::vec3 pos = building->getPos();
+    glm::ivec2 chunkInd = getChunkPos(pos.x, pos.z) + CHUNK_NUM / 2;
+    return chunks[chunkInd.x][chunkInd.y]->addBuilding(building);
+}
+
+Building *World::getHouse() const
+{
+    return this->house;
+}
+
+void World::getNearbyChunks(glm::vec2 pos, std::vector<Chunk*>& list) const
+{
+    glm::ivec2 p = this->getChunkPos(pos.x, pos.y);
+    for (int i = -1; i <= 1; ++i) {
+        for (int j = -1; j <= 1; ++j) {
+            if (this->hasChunk(p.x + i, p.y + j)) {
+                list.emplace_back(this->getChunk(p.x + i, p.y + j));
+            }
+        }
+    }
+}
+
+void World::setupHouse()
+{
+    this->house = new House(glm::vec3(8.0, 0.0001, 8.0));
+
+    for (int i = 4; i < 12; ++i)
+    {
+        for (int j = 4; j < 12; ++j)
+        {
+            this->buildConstruction(i, j, Construction::planks);
+        }
+    }
+
+    this->buildConstruction(4, 10, Construction::bed);
+    this->addBuilding(this->house);
 }

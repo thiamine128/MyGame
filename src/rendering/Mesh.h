@@ -7,6 +7,7 @@ class VertexArrayObject;
 class VertexBufferObject;
 class ElementBufferObject;
 
+#include <glm/gtc/type_ptr.hpp>
 
 #include <vector>
 
@@ -23,7 +24,7 @@ public:
     void render() const;
 
     void quad(Vertex&, Vertex&, Vertex&, Vertex&);
-    void merge(const Mesh*);
+    void merge(const Mesh*, glm::vec3);
     void clear();
     void build() const;
     void setupInstancing(VertexBufferObject*) const;

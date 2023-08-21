@@ -26,3 +26,8 @@ void ElementBufferObject::bufferDataStatic(GLsizeiptr size, const void* data) co
 {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 }
+
+void ElementBufferObject::bufferDataDynamic(GLsizeiptr size, const void* data) const
+{
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
+}

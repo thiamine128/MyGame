@@ -9,4 +9,5 @@ struct Vertex
     glm::vec2 texCoord;
 
     Vertex(float, float, float, float, float, float, float, float);
+    Vertex(glm::vec3, glm::vec3, glm::vec2);
 };

@@ -66,7 +66,6 @@ void Game::run() {
         }
 
         this->processInput();
-
         while (deltaTime > this->tickRate) {
             deltaTime -= this->tickRate;
             this->world->tick();
@@ -78,11 +77,13 @@ void Game::run() {
         {
             this->world->nextDay();
         }
+        for (int i = 0; i < INV_SIZE; ++i) {
+            ItemStack const& is = this->world->getPlayer()->getSlot(i);
+            ImGui::Text("%s : %d", is.item == nullptr ? "None" : is.item->getName().c_str(), is.cnt);
+        }
         ImGui::End();
         
         this->renderer->render();
-
-        
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

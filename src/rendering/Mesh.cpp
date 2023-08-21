@@ -126,10 +126,12 @@ void Mesh::quad(Vertex& v1, Vertex& v2, Vertex& v3, Vertex& v4)
     this->indices.emplace_back(st + 3);
 }
 
-void Mesh::merge(const Mesh* mesh)
+void Mesh::merge(const Mesh* mesh, glm::vec3 offset)
 {
     int st = this->vertices.size();
-    this->vertices.insert(this->vertices.end(), mesh->vertices.begin(), mesh->vertices.end());
+    for (auto v : mesh->vertices) {
+        this->vertices.emplace_back(v.position + offset, v.normal, v.texCoord);
+    }
     for (auto ind : mesh->indices) {
         this->indices.emplace_back(ind + st);
     }

@@ -19,7 +19,8 @@
 #include "Texture.h"
 #include "ShaderManager.h"
 #include "TextureManager.h"
-
+#include "VertexArrayObject.h"
+#include "ElementBufferObject.h"
 
 GameRenderer::GameRenderer()
 {
@@ -35,7 +36,7 @@ GameRenderer::GameRenderer()
     ShaderManager::load();
     
     this->projection = glm::mat4(1.0);
-    this->lightProjection = glm::ortho(-12.0f, 12.0f, -12.0f, 12.0f, -12.0f, 20.0f);
+    this->lightProjection = glm::ortho(-24.0f, 24.0f, -24.0f, 24.0f, -24.0f, 32.0f);
 
     this->updateProjection();
 
@@ -46,6 +47,12 @@ GameRenderer::GameRenderer()
     this->initShadowMap();
 
     TextureManager::initAtlas();
+
+    this->linesVbo = new VertexBufferObject();
+    this->linesVao = new VertexArrayObject();
+    this->linesEbo = new ElementBufferObject();
+
+    this->blockModels[ConstructionType::BEDS] = ModelManager::getModel("assets/model/construction/bed.obj");
 }
 
 GameRenderer::~GameRenderer()
@@ -66,6 +73,8 @@ void GameRenderer::render()
     
     glViewport(0, 0, Window::getInstance()->getWidth(), Window::getInstance()->getHeight());
     this->renderDefault();
+
+    this->renderGui();
 }
 
 Camera* GameRenderer::getCamera() const
@@ -77,7 +86,7 @@ void GameRenderer::renderToDepthMap()
 {
     this->depthMapFramebuffer->bind();
     glClear(GL_DEPTH_BUFFER_BIT);
-    this->renderWorld(Game::getInstance()->getWorld(), ShaderManager::getShadow());
+    this->renderWorld(Game::getInstance()->getWorld(), ShaderManager::getShadow(), true);
     this->depthMapFramebuffer->unbind();
 }
 
@@ -87,62 +96,67 @@ void GameRenderer::renderDefault()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glActiveTexture(GL_TEXTURE1);
     this->depthMap->bind();
-    this->renderWorld(Game::getInstance()->getWorld(), this->defaultShader);
+    this->renderWorld(Game::getInstance()->getWorld(), this->defaultShader, false);
 }
 
-void GameRenderer::renderWorld(World* world, const Shader* shader) const
+void GameRenderer::renderWorld(World* world, const Shader* shader, bool shadow)
 {
     Game::getInstance()->getWorld()->getPlayer()->render(shader);
 
-    auto constructions = world->getConstructions();
-    for (Construction* construction : constructions) {
-        
-    }
-
-    this->renderChunks(world, shader);
+    this->renderChunks(world, shader, shadow);
 }
 
-void GameRenderer::renderChunks(World* world, const Shader* shader) const
+void GameRenderer::renderChunks(World* world, const Shader* shader, bool shadow)
 {
     TextureManager::tiles->getTexture()->bind();
     shader->use();
     shader->setInt("texture0", 0);
     
     glm::vec3 origin = this->camera->getCenter();
-    glm::ivec2 p = world->getChunkPos(origin.x, origin.z);
-    for (int i = -1; i <= 1; ++i) {
-        for (int j = -1; j <= 1; ++j) {
-            if (world->hasChunk(p.x + i, p.y + j)) {
-                glm::mat4 model = glm::mat4(1.0);
-                model = glm::translate(model, glm::vec3((p.x + i) * 16.0, 0.0, (p.y + j) * 16.0));
-                shader->setMat4("model", model);
-                Chunk& chunk = world->getChunk(p.x + i, p.y + j);
-                chunk.getMesh()->render();
-            }
-        }
+    std::vector<Chunk*> chunks;
+    world->getNearbyChunks(glm::vec2(origin.x, origin.z), chunks);
+    for (auto chunk : chunks)
+    {
+        glm::ivec2 p = chunk->getChunkPos();
+        glm::mat4 model = glm::mat4(1.0);
+        model = glm::translate(model, glm::vec3(p.x * 16.0, 0.0, p.y * 16.0));
+        shader->setMat4("model", model);
+        chunk->getMesh()->render();
     }
 
-    for (int i = -1; i <= 1; ++i) {
-        for (int j = -1; j <= 1; ++j) {
-            if (world->hasChunk(p.x + i, p.y + j)) {
-                glm::mat4 model = glm::mat4(1.0);
-                model = glm::translate(model, glm::vec3((p.x + i) * 16.0, 0.0, (p.y + j) * 16.0));
-                shader->setMat4("model", model);
-                Chunk& chunk = world->getChunk(p.x + i, p.y + j);
-                for (int x = 0; x < 16; ++x)
+    for (auto chunk : chunks)
+    {
+        for (int x = 0; x < 16; ++x)
+        {
+            for (int y = 0; y < 16; ++y)
+            {
+                glm::ivec2 p = chunk->getChunkPos();
+                if (chunk->getCrop(x, y) != nullptr)
                 {
-                    for (int y = 0; y < 16; ++y)
+                    glm::mat4 model = glm::mat4(1.0);
+                    model = glm::translate(model, glm::vec3(p.x * 16.0 + x + 0.5, 0.0, p.y * 16.0 + y + 0.5));
+                    shader->setMat4("model", model);
+                    chunk->getCrop(x, y)->getMesh()->render(shader);
+                }
+
+                for (int k = 0; k < 2; ++k)
+                {
+                    Construction* construction = chunk->getConstruction(x, y, k);
+                    if (construction != nullptr && construction->getBuildType() != BuildType::FLOOR)
                     {
-                        if (chunk.getCrop(x, y) != nullptr)
-                        {
-                            glm::mat4 model = glm::mat4(1.0);
-                            model = glm::translate(model, glm::vec3((p.x + i) * 16.0 + x + 0.5, 0.0, (p.y + j) * 16.0 + y + 0.5));
-                            shader->setMat4("model", model);
-                            chunk.getCrop(x, y)->getMesh()->render(shader);
-                        }
+                        glm::mat4 model = glm::mat4(1.0);
+                        model = glm::translate(model, glm::vec3(p.x * 16.0 + x + 0.5, 0.0, p.y * 16.0 + y + 0.5));
+                        shader->setMat4("model", model);
+                        this->blockModels[construction->getType()]->render(shader);
                     }
                 }
             }
+        }
+        auto buildings = chunk->getBuildings();
+        for (auto building : buildings) {
+            if (!shadow && building->getAABB().insideXZ(this->camera->getCenter()))
+                continue;
+            building->render(shader);
         }
     }
 }
@@ -168,9 +182,56 @@ void GameRenderer::initShadowMap()
     this->depthMapFramebuffer->unbind();
 }
 
+
+void GameRenderer::renderAABB(AABB const& aabb) const
+{
+    this->linesVbo->bind();
+    glm::vec3 vert[8] =
+    {
+        {aabb.getMinX(), aabb.getMinY(), aabb.getMinZ()},
+        {aabb.getMaxX(), aabb.getMinY(), aabb.getMinZ()},
+        {aabb.getMaxX(), aabb.getMaxY(), aabb.getMinZ()},
+        {aabb.getMinX(), aabb.getMaxY(), aabb.getMinZ()},
+        {aabb.getMinX(), aabb.getMinY(), aabb.getMaxZ()},
+        {aabb.getMaxX(), aabb.getMinY(), aabb.getMaxZ()},
+        {aabb.getMaxX(), aabb.getMaxY(), aabb.getMaxZ()},
+        {aabb.getMinX(), aabb.getMaxY(), aabb.getMaxZ()},
+    };
+    unsigned int indices[24] =
+    {
+        0, 1,
+        1, 2,
+        2, 3,
+        3, 0,
+        4, 5,
+        5, 6,
+        6, 7,
+        7, 4,
+        0, 4,
+        1, 5,
+        2, 6,
+        3, 7
+    };
+    this->linesVao->bind();
+    this->linesVbo->bind();
+    this->linesVbo->bufferDataDynamic(sizeof(vert), vert);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+    this->linesEbo->bind();
+    this->linesEbo->bufferDataDynamic(sizeof(indices), indices);
+    glEnableVertexAttribArray(0);
+    ShaderManager::getLine()->use();
+    glLineWidth(2.0f);
+    glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
+}
+
+void GameRenderer::renderGui() const
+{
+    
+}
+
 glm::vec3 GameRenderer::getSunPosition() const
 {
-    return this->camera->getCenter() + glm::vec3(-2.0, 2.0, -2.0);
+    return this->camera->getCenter() + glm::vec3(-6.0, 6.0, -6.0);
 }
 
 glm::mat4 GameRenderer::getView() const

@@ -18,6 +18,8 @@ Player::Player(World* world)
     this->world = world;
 
     this->model = ModelManager::getModel("assets/model/stickman.obj");
+
+    this->gain({Item::hoe, 1});
 }
 
 Player::~Player()
@@ -61,8 +63,24 @@ void Player::render(Shader const* shader) const
 void Player::tick()
 {
     this->velocity = Game::getInstance()->getController()->getVelocity();
+    glm::vec3 nextPos = this->pos + this->velocity * 0.05f;
+    std::vector<Chunk*> chunks;
+    this->world->getNearbyChunks(glm::vec2(this->pos.x, this->pos.z), chunks);
+    bool collided = false;
+    for (auto chunk : chunks)
+    {
+        if (chunk->collide(this->getAABB(nextPos)))
+        {
+            collided = true;
+            break;
+        }
+    }
+
     this->prevPos = this->pos;
-    this->pos += this->velocity * 0.05f;
+    if (!collided)
+    {
+        this->pos = nextPos;
+    }
 }
 
 void Player::plow()
@@ -73,6 +91,7 @@ void Player::plow()
         if (crop != nullptr && crop->getStage() == crop->getMaxStage())
         {
             this->world->harvest(this->pos.x, this->pos.z);
+            this->gain({Item::potato, 1});
         } else
         {
             this->world->sow(this->pos.x, this->pos.z, CropProperties::potato);
@@ -80,4 +99,24 @@ void Player::plow()
     }
     else
         this->world->setTile(this->pos.x, this->pos.z, TileType::Plowland);
+}
+
+void Player::gain(ItemStack const& itemStack)
+{
+    this->inventory.gain(itemStack);
+}
+
+ItemStack const &Player::getSlot(int i) const
+{
+    return this->inventory.getSlot(i);
+}
+
+AABB Player::getAABB() const
+{
+    return this->getAABB(this->pos);
+}
+
+AABB Player::getAABB(glm::vec3 const& pos) const
+{
+    return AABB(pos - glm::vec3(0.5, 0.0, 0.5), pos + glm::vec3(0.5, 2.0, 0.5));
 }

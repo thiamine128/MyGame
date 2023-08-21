@@ -10,6 +10,8 @@ class FramebufferObject;
 #include "world/Player.h"
 #include "world/crop/Crop.h"
 #include "InstancedRenderer.h"
+#include "util/AABB.h"
+#include "world/construction/ConstructionType.h"
 
 #include <unordered_map>
 #include <glm/gtc/type_ptr.hpp>
@@ -24,12 +26,14 @@ public:
     Camera* getCamera() const;
     void renderToDepthMap();
     void renderDefault();
-    void renderWorld(World*, const Shader*) const;
-    void renderChunks(World*, const Shader*) const;
+    void renderWorld(World*, const Shader*, bool);
+    void renderChunks(World*, const Shader*, bool);
     void updateProjection();
     void initShadowMap();
-    glm::vec3 getSunPosition() const;
+    void renderAABB(AABB const&) const;
+    void renderGui() const;
 
+    glm::vec3 getSunPosition() const;
     glm::mat4 getView() const;
     glm::mat4 getLightSpace() const;
     glm::mat4 getProjection() const;
@@ -42,4 +46,8 @@ protected:
     FramebufferObject* depthMapFramebuffer;
     Texture* depthMap;
     int shadowWidth, shadowHeight;
+    std::unordered_map<ConstructionType, const Model*> blockModels;
+    VertexArrayObject* linesVao;
+    VertexBufferObject* linesVbo;
+    ElementBufferObject* linesEbo;
 };

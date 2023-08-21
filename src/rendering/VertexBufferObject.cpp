@@ -26,3 +26,8 @@ void VertexBufferObject::bufferDataStatic(GLsizeiptr size, const void* data) con
 {
     glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
 }
+
+void VertexBufferObject::bufferDataDynamic(GLsizeiptr size, const void* data) const
+{
+    glBufferData(GL_ARRAY_BUFFER, size, data, GL_DYNAMIC_DRAW);
+}

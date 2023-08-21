@@ -4,3 +4,8 @@ Vertex::Vertex(float x, float y, float z, float nx, float ny, float nz, float u,
 {
 
 }
+
+Vertex::Vertex(glm::vec3 position, glm::vec3 normal, glm::vec2 texCoord) : position(position), normal(normal), texCoord(texCoord)
+{
+
+}

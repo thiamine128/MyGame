@@ -6,12 +6,14 @@
 Shader* ShaderManager::defaultShader = nullptr;
 Shader* ShaderManager::instanceDefaultShader = nullptr;
 Shader* ShaderManager::shadowShader = nullptr;
+Shader* ShaderManager::lineShader = nullptr;
 
 void ShaderManager::load()
 {
     defaultShader = new Shader("assets/shader/default.vsh", "assets/shader/default.fsh");
     instanceDefaultShader = new Shader("assets/shader/instance_default.vsh", "assets/shader/instance_default.fsh");
     shadowShader = new Shader("assets/shader/shadow.vsh", "assets/shader/shadow.fsh");
+    lineShader = new Shader("assets/shader/line.vsh", "assets/shader/line.fsh");
 }
 
 void ShaderManager::terminate()
@@ -34,6 +36,11 @@ const Shader *ShaderManager::getShadow()
     return shadowShader;
 }
 
+const Shader *ShaderManager::getLine()
+{
+    return lineShader;
+}
+
 void ShaderManager::setupUniforms(const GameRenderer* renderer)
 {
     defaultShader->use();
@@ -44,6 +51,8 @@ void ShaderManager::setupUniforms(const GameRenderer* renderer)
     instanceDefaultShader->setMat4("view", renderer->getView());
     instanceDefaultShader->setMat4("lightSpace", renderer->getLightSpace());
     instanceDefaultShader->setVec3("lightPos", renderer->getSunPosition());
+    lineShader->use();
+    lineShader->setMat4("view", renderer->getView());
     shadowShader->use();
     shadowShader->setMat4("lightSpace", renderer->getLightSpace());
 }
@@ -56,4 +65,6 @@ void ShaderManager::initUniforms(const GameRenderer* renderer)
     instanceDefaultShader->use();
     instanceDefaultShader->setInt("shadowMap", 1);
     instanceDefaultShader->setMat4("projection", renderer->getProjection());
+    lineShader->use();
+    lineShader->setMat4("projection", renderer->getProjection());
 }
