@@ -107,9 +107,9 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
     Window::getInstance()->onResize(width, height);
-    Game::getInstance()->getGameRenderer()->updateProjection();
+    Game::getInstance()->getWorldRenderer()->updateProjection();
     Game::getInstance()->getGui()->updateViewport();
-    ShaderManager::initUniforms(Game::getInstance()->getGameRenderer(), Game::getInstance()->getGui());
+    ShaderManager::initUniforms(Game::getInstance()->getWorldRenderer(), Game::getInstance()->getGui());
 }
 
 void keyCallback(GLFWwindow* window, int key, int code, int action, int mods)

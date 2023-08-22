@@ -1,14 +1,13 @@
 #pragma once
 
-enum class ScreenType
-{
-    Gameplay = 1
-};
+#include "rendering/GuiRenderer.h"
 
 class Screen
 {
 public:
+    Screen(GuiRenderer*);
 
+    virtual void render() const;
 protected:
-    
+    GuiRenderer* guiRenderer;
 };

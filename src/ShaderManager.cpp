@@ -1,9 +1,9 @@
 #include "ShaderManager.h"
 
 #include "Game.h"
-#include "rendering/GameRenderer.h"
+#include "rendering/WorldRenderer.h"
 #include "rendering/Camera.h"
-#include "ui/GUI.h"
+#include "rendering/GuiRenderer.h"
 
 Shader* ShaderManager::defaultShader = nullptr;
 Shader* ShaderManager::instanceDefaultShader = nullptr;
@@ -64,7 +64,7 @@ const Shader * ShaderManager::getText()
     return textShader;
 }
 
-void ShaderManager::setupUniforms(const GameRenderer* renderer)
+void ShaderManager::setupUniforms(const WorldRenderer* renderer)
 {
     defaultShader->use();
     float t = (float) Game::getInstance()->getWorld()->getTime() / (float) Game::getInstance()->getWorld()->getTimePerDay();
@@ -82,7 +82,7 @@ void ShaderManager::setupUniforms(const GameRenderer* renderer)
     shadowShader->setMat4("lightSpace", renderer->getLightSpace());
 }
 
-void ShaderManager::initUniforms(const GameRenderer* renderer, const GUI* gui)
+void ShaderManager::initUniforms(const WorldRenderer* renderer, const GuiRenderer* gui)
 {
     defaultShader->use();
     defaultShader->setInt("shadowMap", 1);

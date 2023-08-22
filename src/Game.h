@@ -2,8 +2,9 @@
 
 #include "world/World.h"
 #include "Controller.h"
-#include "rendering/GameRenderer.h"
-#include "ui/GUI.h"
+#include "rendering/WorldRenderer.h"
+#include "rendering/GuiRenderer.h"
+#include "ui/ScreenManager.h"
 
 class Game
 {
@@ -15,10 +16,10 @@ public:
     void init();
     void run();
     
-    GameRenderer* getGameRenderer() const;
+    WorldRenderer* getWorldRenderer() const;
     Controller* getController() const;
     World* getWorld() const;
-    GUI* getGui() const;
+    GuiRenderer* getGui() const;
     float getDeltaTime() const;
     float getFrameTime() const;
 
@@ -26,15 +27,18 @@ public:
     static void terminate();
 protected:
     World* world;
-    GUI* gui;
-    GameRenderer* renderer;
+    GuiRenderer* gui;
+    WorldRenderer* renderer;
     Controller* controller;
+    ScreenManager* screenManager;
     float currentFrame, lastFrame, deltaTime;
     float fpsLastTime;
     int frameCnt;
     int fps;
     
     Game();
+
+    void initRendering();
 
     static Game* instance;
 };

@@ -1,8 +1,8 @@
 #pragma once
 
 class Shader;
-class GameRenderer;
-class GUI;
+class WorldRenderer;
+class GuiRenderer;
 
 class ShaderManager
 {
@@ -17,8 +17,8 @@ public:
     static const Shader* getGui();
     static const Shader* getGuiModel();
     static const Shader* getText();
-    static void setupUniforms(const GameRenderer*);
-    static void initUniforms(const GameRenderer*, const GUI*);
+    static void setupUniforms(const WorldRenderer*);
+    static void initUniforms(const WorldRenderer*, const GuiRenderer*);
 protected:
     static Shader* defaultShader;
     static Shader* instanceDefaultShader;

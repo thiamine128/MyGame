@@ -5,8 +5,8 @@
 #include "ShaderManager.h"
 #include "Window.h"
 #include "world/World.h"
-#include "rendering/GameRenderer.h"
 #include "Controller.h"
+#include "rendering/ChunkTessellator.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -20,6 +20,16 @@ Game* Game::instance = nullptr;
 
 Game::Game() : tickRate(0.05f) {
     
+}
+
+void Game::initRendering()
+{
+    if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
+        std::cout << "Failed to load glad." << std::endl;
+    }
+    glEnable(GL_DEPTH_TEST);
+    TextureManager::initAtlas();
+    ChunkTessellator::initConstructionModels();
 }
 
 Game::~Game() {
@@ -40,13 +50,20 @@ void Game::init() {
     ImGui_ImplOpenGL3_Init("#version 330");
 
 
-    this->renderer = new GameRenderer();
+    this->initRendering();
+
+    this->renderer = new WorldRenderer();
     this->world = new World();
     this->controller = new Controller();
     this->currentFrame = this->lastFrame = this->deltaTime = 0.0f;
-    this->gui = new GUI();
+    this->gui = new GuiRenderer();
+    this->screenManager = new ScreenManager(this->gui);
+
+    this->screenManager->pushGameScreen();
 
     ShaderManager::initUniforms(this->renderer, this->gui);
+
+    this->renderer->setWorld(this->world);
 }
 
 void Game::run() {
@@ -89,9 +106,7 @@ void Game::run() {
         
         ImGui::End();
         
-        this->renderer->render();
-
-        this->gui->render();
+        this->screenManager->render();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -100,7 +115,7 @@ void Game::run() {
     }
 }
 
-GameRenderer* Game::getGameRenderer() const
+WorldRenderer* Game::getWorldRenderer() const
 {
     return this->renderer;
 }
@@ -115,7 +130,7 @@ World *Game::getWorld() const
     return this->world;
 }
 
-GUI *Game::getGui() const
+GuiRenderer *Game::getGui() const
 {
     return this->gui;
 }

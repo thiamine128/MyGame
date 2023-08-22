@@ -2,7 +2,7 @@
 
 #include "Window.h"
 #include "Game.h"
-#include "rendering/GameRenderer.h"
+#include "rendering/WorldRenderer.h"
 #include "world/item/Item.h"
 #include <GLFW/glfw3.h>
 
@@ -56,7 +56,7 @@ void Controller::onMouseButtonPress(int button, double x, double y) const
 {
     if (button == GLFW_MOUSE_BUTTON_LEFT)
     {
-        glm::vec3 pos = Game::getInstance()->getGameRenderer()->getWorldPos(glm::vec2(x, y));
+        glm::vec3 pos = Game::getInstance()->getWorldRenderer()->getWorldPos(glm::vec2(x, y));
         pos.x = floor(pos.x);
         pos.z = floor(pos.z);
         Player* player = Game::getInstance()->getWorld()->getPlayer();
