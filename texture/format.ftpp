@@ -5,6 +5,16 @@
   "savePath": "",
   "images": [
     {
+      "name": "bed.png",
+      "path": "D:/MyProject/MyGame/assets/model/construction/bed.png",
+      "folder": ""
+    },
+    {
+      "name": "fence.png",
+      "path": "D:/MyProject/MyGame/assets/model/construction/fence.png",
+      "folder": ""
+    },
+    {
       "name": "ground.png",
       "path": "D:/MyProject/MyGame/texture/ground.png",
       "folder": ""
@@ -37,11 +47,11 @@
     "width": 2048,
     "height": 2048,
     "fixedSize": false,
-    "powerOfTwo": false,
+    "powerOfTwo": true,
     "padding": 0,
     "extrude": 0,
-    "allowRotation": true,
-    "allowTrim": true,
+    "allowRotation": false,
+    "allowTrim": false,
     "trimMode": "trim",
     "alphaThreshold": "0",
     "detectIdentical": true,

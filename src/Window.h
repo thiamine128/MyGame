@@ -4,7 +4,7 @@ class GLFWwindow;
 
 void framebufferSizeCallback(GLFWwindow*, int, int);
 void keyCallback(GLFWwindow*, int, int, int, int);
-
+void mouseButtonCallback(GLFWwindow*, int, int, int);
 class Window
 {
 public:

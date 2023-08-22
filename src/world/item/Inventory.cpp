@@ -33,3 +33,15 @@ void Inventory::gain(ItemStack const& itemStack)
         slots[empty] = itemStack;
     }
 }
+
+void Inventory::decrease(int i)
+{
+    if (this->slots[i].cnt >= 0)
+    {
+        this->slots[i].cnt -= 1;
+        if (this->slots[i].cnt == 0)
+        {
+            this->slots[i].item = nullptr;
+        }
+    }
+}

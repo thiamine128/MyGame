@@ -11,6 +11,7 @@ public:
 
     ItemStack const& getSlot(int) const;
     void gain(ItemStack const&);
+    void decrease(int);
 protected:
     ItemStack slots[INV_SIZE];
 };

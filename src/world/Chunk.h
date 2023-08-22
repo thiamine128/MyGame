@@ -4,9 +4,6 @@
 #include "tile/Tile.h"
 #include "building/Building.h"
 #include "construction/Construction.h"
-#include "rendering/Mesh.h"
-#include "rendering/VertexBufferObject.h"
-#include "rendering/TextureUVSet.h"
 #include <glm/gtc/type_ptr.hpp>
 
 class Chunk
@@ -23,8 +20,10 @@ public:
     void harvest(int, int);
     bool canBuildAt(int, int, Construction*) const;
     void buildConstruction(int, int, Construction*);
+    void updateFenceConnection(int, int, int);
+    int getFenceConnection(int, int) const;
     void addBuilding(Building*);
-    void buildMesh();
+    
     void nextDay();
     std::vector<Building*>& getBuildings();
     glm::ivec2 const& getChunkPos() const;
@@ -33,14 +32,9 @@ protected:
     Tile tiles[16][16];
     Crop* crops[16][16];
     Construction* constructions[16][16][2];
+    int fenceConnection[16][16];
     std::vector<Building*> buildings;
     bool dirty;
     Mesh* mesh;
     glm::ivec2 pos;
-
-    static std::unordered_map<TileType, std::string> tileTexture;
-
-    void tesselatePlane(glm::vec3, TextureUVSet const&, Mesh*) const;
-    void tesselateFace(glm::vec3, glm::vec3, unsigned int, TextureUVSet const&, Mesh*) const;
-    void tesselatePlanks(glm::ivec3, Mesh*) const;
 };

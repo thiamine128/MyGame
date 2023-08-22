@@ -37,6 +37,7 @@ void Window::init(int width, int height, const char* title)
     glfwMakeContextCurrent(this->window);
     glfwSetFramebufferSizeCallback(this->window, framebufferSizeCallback);
     glfwSetKeyCallback(this->window, keyCallback);
+    glfwSetMouseButtonCallback(this->window, mouseButtonCallback);
 }
 
 Window::~Window()
@@ -116,5 +117,15 @@ void keyCallback(GLFWwindow* window, int key, int code, int action, int mods)
     if (action == GLFW_PRESS)
     {
         Game::getInstance()->getController()->onPress(key);
+    }
+}
+
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+{
+    if (action == GLFW_PRESS)
+    {
+        double x, y;
+        glfwGetCursorPos(window, &x, &y);
+        Game::getInstance()->getController()->onMouseButtonPress(button, x, y);
     }
 }

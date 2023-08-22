@@ -2,6 +2,9 @@
 
 #include "Game.h"
 #include "building/House.h"
+#include "building/Store.h"
+
+#include <iostream>
 
 World::World()
 {
@@ -15,6 +18,8 @@ World::World()
     this->player = new Player(this);
     
     this->setupHouse();
+    this->setupStore();
+    this->timeInDay = 0;
 }
 
 World::~World()
@@ -43,6 +48,12 @@ Player *World::getPlayer() const
 void World::tick()
 {
     this->player->tick();
+    ++this->timeInDay;
+    if (this->timeInDay == this->getTimePerDay())
+    {
+        this->timeInDay = 0;
+        this->nextDay();
+    }
 }
 
 glm::ivec2 World::getChunkPos(int x, int y) const
@@ -99,13 +110,50 @@ void World::harvest(int x, int y)
     chunks[chunkInd.x][chunkInd.y]->harvest(x, y);
 }
 
-void World::buildConstruction(int x, int y, Construction* construction)
+bool World::canBuildAt(int x, int y, Construction* construction)
 {
     glm::ivec2 chunkInd = getChunkPos(x, y) + CHUNK_NUM / 2;
     x %= 16, y %= 16;
     if (x < 0) x += 16;
     if (y < 0) y += 16;
+    return chunks[chunkInd.x][chunkInd.y]->canBuildAt(x, y, construction);
+}
+
+int dx[] = {0, -1, 1, 0};
+int dy[] = {-1, 0, 0, 1};
+
+void World::buildConstruction(int x, int y, Construction* construction)
+{
+    glm::ivec2 chunkInd = getChunkPos(x, y) + CHUNK_NUM / 2;
+    int ox = x, oy = y;
+    x %= 16, y %= 16;
+    if (x < 0) x += 16;
+    if (y < 0) y += 16;
     chunks[chunkInd.x][chunkInd.y]->buildConstruction(x, y, construction);
+    if (construction == Construction::fence)
+    {
+        for (int i = 0; i < 4; ++i)
+        {
+            if (this->getConstruction(ox + dx[i], oy + dy[i], 1) == Construction::fence)
+            {
+                int v = this->getFenceConnection(ox, oy);
+                v |= (1 << i);
+                this->updateFenceConnection(ox, oy, v);
+                v = this->getFenceConnection(ox + dx[i], oy + dy[i]);
+                v |= (1 << (3 - i));
+                this->updateFenceConnection(ox + dx[i], oy + dy[i], v);
+            }
+        }
+    }
+}
+
+Construction *World::getConstruction(int x, int y, int z)
+{
+    glm::ivec2 chunkInd = getChunkPos(x, y) + CHUNK_NUM / 2;
+    x %= 16, y %= 16;
+    if (x < 0) x += 16;
+    if (y < 0) y += 16;
+    return chunks[chunkInd.x][chunkInd.y]->getConstruction(x, y, z);
 }
 
 const Crop *World::getCrop(int x, int y) const
@@ -154,6 +202,16 @@ void World::getNearbyChunks(glm::vec2 pos, std::vector<Chunk*>& list) const
     }
 }
 
+int World::getTime() const
+{
+    return this->timeInDay;
+}
+
+int World::getTimePerDay() const
+{
+    return 200;
+}
+
 void World::setupHouse()
 {
     this->house = new House(glm::vec3(8.0, -0.001, 8.0));
@@ -168,4 +226,29 @@ void World::setupHouse()
 
     this->buildConstruction(4, 10, Construction::bed);
     this->addBuilding(this->house);
+}
+
+void World::setupStore()
+{
+    this->store = new Store(glm::vec3(-6.0, -0.0001, 8.0));
+
+    this->addBuilding(this->store);
+}
+
+int World::getFenceConnection(int x, int y)
+{
+    glm::ivec2 chunkInd = getChunkPos(x, y) + CHUNK_NUM / 2;
+    x %= 16, y %= 16;
+    if (x < 0) x += 16;
+    if (y < 0) y += 16;
+    return chunks[chunkInd.x][chunkInd.y]->getFenceConnection(x, y);
+}
+
+void World::updateFenceConnection(int x, int y, int value)
+{
+    glm::ivec2 chunkInd = getChunkPos(x, y) + CHUNK_NUM / 2;
+    x %= 16, y %= 16;
+    if (x < 0) x += 16;
+    if (y < 0) y += 16;
+    return chunks[chunkInd.x][chunkInd.y]->updateFenceConnection(x, y, value);
 }

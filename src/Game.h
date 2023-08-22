@@ -3,7 +3,7 @@
 #include "world/World.h"
 #include "Controller.h"
 #include "rendering/GameRenderer.h"
-#include "GUI.h"
+#include "ui/GUI.h"
 
 class Game
 {
@@ -14,7 +14,7 @@ public:
 
     void init();
     void run();
-    void processInput() const;
+    
     GameRenderer* getGameRenderer() const;
     Controller* getController() const;
     World* getWorld() const;

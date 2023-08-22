@@ -1,8 +1,9 @@
 #include "ShaderManager.h"
 
+#include "Game.h"
 #include "rendering/GameRenderer.h"
 #include "rendering/Camera.h"
-#include "GUI.h"
+#include "ui/GUI.h"
 
 Shader* ShaderManager::defaultShader = nullptr;
 Shader* ShaderManager::instanceDefaultShader = nullptr;
@@ -66,6 +67,8 @@ const Shader * ShaderManager::getText()
 void ShaderManager::setupUniforms(const GameRenderer* renderer)
 {
     defaultShader->use();
+    float t = (float) Game::getInstance()->getWorld()->getTime() / (float) Game::getInstance()->getWorld()->getTimePerDay();
+    defaultShader->setFloat("time", t);
     defaultShader->setMat4("view", renderer->getView());
     defaultShader->setMat4("lightSpace", renderer->getLightSpace());
     defaultShader->setVec3("lightPos", renderer->getSunPosition());

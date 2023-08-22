@@ -68,7 +68,8 @@ void Game::run() {
             this->frameCnt = 0;
         }
 
-        this->processInput();
+        this->controller->processInput();
+        
         while (deltaTime > this->tickRate) {
             deltaTime -= this->tickRate;
             this->world->tick();
@@ -80,10 +81,12 @@ void Game::run() {
         {
             this->world->nextDay();
         }
+        ImGui::Text("Time: %d", this->world->getTime());
         for (int i = 0; i < INV_SIZE; ++i) {
             ItemStack const& is = this->world->getPlayer()->getSlot(i);
             ImGui::Text("%s : %d", is.item == nullptr ? "None" : is.item->getName().c_str(), is.cnt);
         }
+        
         ImGui::End();
         
         this->renderer->render();
@@ -95,11 +98,6 @@ void Game::run() {
         Window::getInstance()->swapBuffers();
         Window::getInstance()->pollEvents();
     }
-}
-
-void Game::processInput() const {
-    if (Window::getInstance()->getKey(GLFW_KEY_SPACE) == GLFW_PRESS)
-        Window::getInstance()->close();
 }
 
 GameRenderer* Game::getGameRenderer() const

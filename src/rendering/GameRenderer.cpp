@@ -21,6 +21,7 @@
 #include "TextureManager.h"
 #include "VertexArrayObject.h"
 #include "ElementBufferObject.h"
+#include "ChunkTessellator.h"
 
 GameRenderer::GameRenderer()
 {
@@ -51,7 +52,7 @@ GameRenderer::GameRenderer()
     this->linesVao = new VertexArrayObject();
     this->linesEbo = new ElementBufferObject();
 
-    this->blockModels[ConstructionType::BEDS] = ModelManager::getModel("assets/model/construction/bed.obj");
+    ChunkTessellator::initConstructionModels();
 }
 
 GameRenderer::~GameRenderer()
@@ -72,6 +73,8 @@ void GameRenderer::render()
     
     glViewport(0, 0, Window::getInstance()->getWidth(), Window::getInstance()->getHeight());
     this->renderDefault();
+
+    this->renderSelected();
 }
 
 Camera* GameRenderer::getCamera() const
@@ -135,18 +138,6 @@ void GameRenderer::renderChunks(World* world, const Shader* shader, bool shadow)
                     shader->setMat4("model", model);
                     chunk->getCrop(x, y)->getMesh()->render(shader);
                 }
-
-                for (int k = 0; k < 2; ++k)
-                {
-                    Construction* construction = chunk->getConstruction(x, y, k);
-                    if (construction != nullptr && construction->getBuildType() != BuildType::FLOOR)
-                    {
-                        glm::mat4 model = glm::mat4(1.0);
-                        model = glm::translate(model, glm::vec3(p.x * 16.0 + x + 0.5, 0.0, p.y * 16.0 + y + 0.5));
-                        shader->setMat4("model", model);
-                        this->blockModels[construction->getType()]->render(shader);
-                    }
-                }
             }
         }
         auto buildings = chunk->getBuildings();
@@ -161,6 +152,23 @@ void GameRenderer::renderChunks(World* world, const Shader* shader, bool shadow)
 void GameRenderer::updateProjection()
 {
     this->projection = glm::perspective(glm::radians(45.0f), (float) Window::getInstance()->getWidth() / (float) Window::getInstance()->getHeight(), 0.1f, 100.0f);
+}
+
+glm::vec3 GameRenderer::getWorldPos(glm::vec2 const& viewpos) const
+{
+    float x = 2.0f * viewpos.x / Window::getInstance()->getWidth() - 1.0f;
+    float y = 1.0f - 2.0f * viewpos.y / Window::getInstance()->getHeight();
+    glm::vec4 rayclip = glm::vec4(x, y, -1.0f, 1.0f);
+    glm::vec4 worldpos = glm::inverse(this->projection) * rayclip;
+    worldpos.z = -1.0f, worldpos.w = 0.0f;
+    worldpos = glm::inverse(this->getView()) * worldpos;
+    glm::vec3 result = glm::vec3(worldpos.x, worldpos.y, worldpos.z);
+    glm::vec3 cpos = this->camera->getPos();
+    
+    if (result.y != 0.0f)
+        result /= result.y;
+    result = cpos - cpos.y * result;
+    return result;
 }
 
 void GameRenderer::initShadowMap()
@@ -219,9 +227,20 @@ void GameRenderer::renderAABB(AABB const& aabb) const
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
 }
 
+void GameRenderer::renderSelected()
+{
+    glm::vec3 pos = this->getWorldPos(glm::vec2(Game::getInstance()->getController()->getMouseX(), Game::getInstance()->getController()->getMouseY()));
+    pos.x = floor(pos.x);
+    pos.z = floor(pos.z);
+    AABB aabb = AABB(glm::vec3(pos.x, 0.001, pos.z), glm::ivec3(pos.x + 1, 1, pos.z + 1));
+    this->renderAABB(aabb);
+}
+
 glm::vec3 GameRenderer::getSunPosition() const
 {
-    return this->camera->getCenter() + glm::vec3(-6.0, 6.0, -6.0);
+    float t = (float) Game::getInstance()->getWorld()->getTime() / (float) Game::getInstance()->getWorld()->getTimePerDay() * 360.0f * 0.7f;
+
+    return this->camera->getCenter() + glm::vec3(6.0 * glm::cos(glm::radians(t)), 6.0 * glm::sin(glm::radians(t)), -6.0);
 }
 
 glm::mat4 GameRenderer::getView() const

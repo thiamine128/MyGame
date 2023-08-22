@@ -24,14 +24,8 @@ public:
 
     void render();
     Camera* getCamera() const;
-    void renderToDepthMap();
-    void renderDefault();
-    void renderWorld(World*, const Shader*, bool);
-    void renderChunks(World*, const Shader*, bool);
     void updateProjection();
-    void initShadowMap();
-    void renderAABB(AABB const&) const;
-
+    glm::vec3 getWorldPos(glm::vec2 const&) const;
     glm::vec3 getSunPosition() const;
     glm::mat4 getView() const;
     glm::mat4 getLightSpace() const;
@@ -45,8 +39,15 @@ protected:
     FramebufferObject* depthMapFramebuffer;
     Texture* depthMap;
     int shadowWidth, shadowHeight;
-    std::unordered_map<ConstructionType, const Model*> blockModels;
     VertexArrayObject* linesVao;
     VertexBufferObject* linesVbo;
     ElementBufferObject* linesEbo;
+    
+    void renderToDepthMap();
+    void renderDefault();
+    void renderWorld(World*, const Shader*, bool);
+    void renderChunks(World*, const Shader*, bool);
+    void initShadowMap();
+    void renderAABB(AABB const&) const;
+    void renderSelected();
 };

@@ -3,7 +3,8 @@
 enum class ConstructionType
 {
     PLANKS = 1,
-    BEDS = 2
+    BEDS = 2,
+    FENCE = 3
 };
 
 enum class BuildType

@@ -6,6 +6,8 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include <unordered_map>
+
 class Construction
 {
 public:
@@ -18,6 +20,9 @@ public:
 
     static Construction* planks;
     static Construction* bed;
+    static Construction* fence;
+
+    static std::unordered_map<ConstructionType, Construction*> constructions;
 protected:
     ConstructionType type;
     BuildType buildType;

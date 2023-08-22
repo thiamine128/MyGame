@@ -21,10 +21,15 @@ public:
     void tick();
     void plow();
     void gain(ItemStack const&);
+    void decreaseItemCnt();
     ItemStack const& getSlot(int) const;
     AABB getAABB() const;
     AABB getAABB(glm::vec3 const&) const;
     Inventory* getInventory();
+    ItemStack const& getSelectedItem() const;
+    int getSelectedSlot() const;
+    void selectItem(int);
+    World* getWorld() const;
 protected:
     glm::vec3 pos;
     glm::vec3 prevPos;
@@ -32,4 +37,5 @@ protected:
     Inventory inventory;
     World* world;
     const Model* model;
+    int selectedSlot;
 };

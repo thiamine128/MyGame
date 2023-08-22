@@ -28,7 +28,7 @@ public:
     void render();
     void renderSlots();
     void renderImage(int, int, int, int, const Texture*);
-    void renderGuiModel(int, int, int, const Model*);
+    void renderGuiModel(int, int, int, const Model*, glm::mat4 const&);
     void renderSlotItems(Inventory*);
     void updateViewport();
     void renderText(float, float, float, std::string const&);
@@ -39,6 +39,7 @@ protected:
     VertexBufferObject* vbo;
     ElementBufferObject* ebo;
     const Texture* slotTexture;
+    const Texture* selectedSlotTexture;
     glm::vec2 viewport;
     glm::mat4 projection;
     std::unordered_map<char, Character> characters;

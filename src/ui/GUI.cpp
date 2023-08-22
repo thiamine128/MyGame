@@ -31,6 +31,7 @@ GUI::GUI()
     
     this->setupRect();
     this->slotTexture = TextureManager::getTexture("assets/texture/gui/itemslot.png");
+    this->selectedSlotTexture = TextureManager::getTexture("assets/texture/gui/itemslot_selected.png");
 
     this->initFont();
 
@@ -49,12 +50,16 @@ void GUI::render()
 void GUI::renderSlots()
 {
     int w = this->viewport.y / 10.0;
+    Player* player = Game::getInstance()->getWorld()->getPlayer();
     for (int i = 0; i < 9; ++i)
     {
-        this->renderImage(i * w, 0, w, w, this->slotTexture);
+        if (i == player->getSelectedSlot())
+            this->renderImage(i * w, 0, w, w, this->selectedSlotTexture);
+        else
+            this->renderImage(i * w, 0, w, w, this->slotTexture);
     }
     glClear(GL_DEPTH_BUFFER_BIT);
-    Inventory* inventory = Game::getInstance()->getWorld()->getPlayer()->getInventory();
+    Inventory* inventory = player->getInventory();
     this->renderSlotItems(inventory);
     glClear(GL_DEPTH_BUFFER_BIT);
     for (int i = 0; i < 9; ++i)
@@ -81,14 +86,15 @@ void GUI::renderImage(int x, int y, int w, int h, const Texture* texture)
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
-void GUI::renderGuiModel(int x, int y, int size, const Model* model)
+void GUI::renderGuiModel(int x, int y, int size, const Model* model, glm::mat4 const& modelMatrix)
 {
     const Shader* shader = ShaderManager::getGuiModel();
-    glm::mat4 modelMatrix = glm::mat4(1.0);
-    modelMatrix = glm::translate(modelMatrix, glm::vec3(x, y, 0));
-    modelMatrix = glm::scale(modelMatrix, glm::vec3(size));
+    glm::mat4 finalModel = glm::mat4(1.0);
+    finalModel = glm::translate(finalModel, glm::vec3(x, y, 0));
+    finalModel = glm::scale(finalModel, glm::vec3(size));
+    finalModel = finalModel * modelMatrix;
     shader->use();
-    shader->setMat4("model", modelMatrix);
+    shader->setMat4("model", finalModel);
     model->render(shader);
 }
 
@@ -100,7 +106,7 @@ void GUI::renderSlotItems(Inventory* inventory)
         Item* item = inventory->getSlot(i).item;
         if (item != nullptr)
         {
-            this->renderGuiModel(w / 2 + w * i, w / 16, w, ModelManager::getModel(item->getModelPath()));
+            this->renderGuiModel(w / 2 + w * i, w / 2, w, ModelManager::getModel(item->getModelPath()), item->getGuiTransform());
         }
     }
 }

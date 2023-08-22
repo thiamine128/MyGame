@@ -20,6 +20,10 @@ Player::Player(World* world)
     this->model = ModelManager::getModel("assets/model/stickman.obj");
 
     this->gain({Item::hoe, 1});
+    this->gain({Item::potatoSeeds, 10});
+    this->gain({Item::planks, 128});
+    this->gain({Item::fence, 128});
+    this->selectedSlot = 0;
 }
 
 Player::~Player()
@@ -106,6 +110,11 @@ void Player::gain(ItemStack const& itemStack)
     this->inventory.gain(itemStack);
 }
 
+void Player::decreaseItemCnt()
+{
+    this->inventory.decrease(this->getSelectedSlot());
+}
+
 ItemStack const &Player::getSlot(int i) const
 {
     return this->inventory.getSlot(i);
@@ -124,4 +133,24 @@ AABB Player::getAABB(glm::vec3 const& pos) const
 Inventory* Player::getInventory()
 {
     return &(this->inventory);
+}
+
+ItemStack const &Player::getSelectedItem() const
+{
+    return this->inventory.getSlot(selectedSlot);
+}
+
+int Player::getSelectedSlot() const
+{
+    return this->selectedSlot;
+}
+
+void Player::selectItem(int i)
+{
+    this->selectedSlot = i;
+}
+
+World *Player::getWorld() const
+{
+    return this->world;
 }

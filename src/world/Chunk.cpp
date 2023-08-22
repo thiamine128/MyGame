@@ -3,11 +3,7 @@
 #include "TextureManager.h"
 #include "rendering/Vertex.h"
 
-std::unordered_map<TileType, std::string> Chunk::tileTexture =
-{
-    {TileType::Ground, "ground"},
-    {TileType::Plowland, "plowland"}
-};
+#include "rendering/ChunkTessellator.h"
 
 Chunk::Chunk(glm::ivec2 pos) : pos(pos)
 {
@@ -20,6 +16,7 @@ Chunk::Chunk(glm::ivec2 pos) : pos(pos)
         {
             crops[i][j] = nullptr;
             constructions[i][j][0] = constructions[i][j][1] = nullptr;
+            fenceConnection[i][j] = 0;
         }
     }
 }
@@ -53,7 +50,7 @@ void Chunk::sow(int x, int y, CropProperties* crop)
 const Mesh* Chunk::getMesh()
 {
     if (this->dirty) {
-        this->buildMesh();
+        ChunkTessellator::tessellate(this, this->mesh);
         this->dirty = false;
     }
     return this->mesh;
@@ -102,8 +99,6 @@ bool Chunk::canBuildAt(int x, int y, Construction* construction) const
     return false;
 }
 
-#include <iostream>
-
 void Chunk::buildConstruction(int x, int y, Construction* construction)
 {
     if (this->canBuildAt(x, y, construction))
@@ -113,37 +108,25 @@ void Chunk::buildConstruction(int x, int y, Construction* construction)
             this->constructions[x][y][0] = construction;
         else
             this->constructions[x][y][1] = construction;
+        
+        this->dirty = true;
     }
+}
+
+void Chunk::updateFenceConnection(int x, int y, int value)
+{
+    this->fenceConnection[x][y] = value;
+    this->dirty = true;
+}
+
+int Chunk::getFenceConnection(int x, int y) const
+{
+    return this->fenceConnection[x][y];
 }
 
 void Chunk::addBuilding(Building* building)
 {
     this->buildings.push_back(building);
-}
-
-void Chunk::buildMesh()
-{
-    this->mesh->clear();
-    
-    for (int i = 0; i < 16; ++i)
-    {
-        for (int j = 0; j < 16; ++j)
-        {
-            TileType tile = this->getTile(i, j);
-            TextureUVSet const& uv = TextureManager::tiles->getUVSet(tileTexture[tile]);
-            this->tesselatePlane(glm::ivec3(i, 0, j), uv, this->mesh);
-
-            for (int k = 0; k < 2; ++k)
-            {
-                Construction* constructions = this->constructions[i][j][k];
-                if (constructions == Construction::planks)
-                {
-                    this->tesselatePlanks(glm::vec3(i, 0.1, j), this->mesh);
-                }
-            }
-        }
-    }
-    this->mesh->build();
 }
 
 void Chunk::nextDay()
@@ -203,18 +186,4 @@ bool Chunk::collide(AABB const& aabb) const
         }
     }
     return false;
-}
-
-void Chunk::tesselatePlane(glm::vec3 pos, TextureUVSet const& uvs, Mesh* mesh) const
-{
-    Vertex v1 = {pos.x + 1, pos.y, pos.z + 1, 0, 1, 0, uvs.coords[0].x, uvs.coords[0].y};
-    Vertex v2 = {pos.x + 1, pos.y, pos.z, 0, 1, 0, uvs.coords[1].x, uvs.coords[1].y};
-    Vertex v3 = {pos.x, pos.y, pos.z, 0, 1, 0, uvs.coords[3].x, uvs.coords[3].y};
-    Vertex v4 = {pos.x, pos.y, pos.z + 1, 0, 1, 0, uvs.coords[2].x, uvs.coords[2].y};
-    mesh->quad(v1, v2, v3, v4);
-}
-
-void Chunk::tesselatePlanks(glm::ivec3 pos, Mesh* mesh) const
-{
-    this->tesselatePlane(glm::vec3(pos.x, pos.y + 0.001f, pos.z), TextureManager::tiles->getUVSet("planks"), this->mesh);
 }
