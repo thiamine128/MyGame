@@ -1,9 +1,6 @@
 #pragma once
 
-#include "rendering/Texture.h"
-#include "rendering/VertexArrayObject.h"
-#include "rendering/VertexBufferObject.h"
-#include "rendering/ElementBufferObject.h"
+#include "rendering/glhelper.h"
 #include "world/item/Inventory.h"
 
 class Model;

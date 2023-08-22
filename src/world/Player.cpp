@@ -4,7 +4,6 @@
 
 #include <iostream>
 
-
 #include "ModelManager.h"
 
 #include <glm/glm.hpp>

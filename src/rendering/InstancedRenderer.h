@@ -1,8 +1,7 @@
 #pragma once
 
 #include "Mesh.h"
-#include "Shader.h"
-#include "VertexBufferObject.h"
+#include "glhelper.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
 

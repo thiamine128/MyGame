@@ -1,12 +1,5 @@
 #include "Mesh.h"
 
-#include "Vertex.h"
-#include "Texture.h"
-#include "Shader.h"
-#include "VertexArrayObject.h"
-#include "VertexBufferObject.h"
-#include "ElementBufferObject.h"
-
 #include <string>
 #include <iostream>
 

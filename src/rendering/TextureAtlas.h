@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Texture.h"
+#include "glhelper.h"
 #include "TextureUVSet.h"
 
 #include <unordered_map>

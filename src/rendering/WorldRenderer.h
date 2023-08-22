@@ -5,8 +5,7 @@ class Model;
 class World;
 class FramebufferObject;
 
-#include "rendering/Shader.h"
-#include "rendering/Texture.h"
+#include "rendering/glhelper.h"
 #include "world/World.h"
 #include "world/crop/Crop.h"
 #include "InstancedRenderer.h"

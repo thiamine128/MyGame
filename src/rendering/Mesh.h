@@ -1,12 +1,7 @@
 #pragma once
 
-class Vertex;
-class Texture;
-class Shader;
-class VertexArrayObject;
-class VertexBufferObject;
-class ElementBufferObject;
-
+#include "Vertex.h"
+#include "glhelper.h"
 #include <glm/gtc/type_ptr.hpp>
 
 #include <vector>

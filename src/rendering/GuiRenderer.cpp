@@ -1,6 +1,5 @@
 #include "GuiRenderer.h"
 
-#include "rendering/Shader.h"
 #include "TextureManager.h"
 #include "ShaderManager.h"
 #include "ModelManager.h"

@@ -10,16 +10,11 @@
 
 #include "Camera.h"
 #include "Model.h"
-#include "FramebufferObject.h"
 #include "ModelManager.h"
 #include "Game.h"
 #include "Window.h"
-#include "Shader.h"
-#include "Texture.h"
 #include "ShaderManager.h"
 #include "TextureManager.h"
-#include "VertexArrayObject.h"
-#include "ElementBufferObject.h"
 #include "ChunkTessellator.h"
 
 WorldRenderer::WorldRenderer()
@@ -38,7 +33,6 @@ WorldRenderer::WorldRenderer()
     this->groundModel = ModelManager::getModel("assets/model/ground.obj");
 
     this->initShadowMap();
-
 
     this->linesVbo = new VertexBufferObject();
     this->linesVao = new VertexArrayObject();
