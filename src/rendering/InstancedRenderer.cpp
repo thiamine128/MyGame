@@ -7,17 +7,7 @@ InstancedRenderer::InstancedRenderer(const Mesh* mesh)
     this->mesh->setupInstancing(this->vbo);
 }
 
-void InstancedRenderer::reset()
-{
-    this->positions.clear();
-}
-
-void InstancedRenderer::addInstance(glm::vec3 pos)
-{
-    this->positions.push_back(pos);
-}
-
-void InstancedRenderer::updateModelMatrices()
+void InstancedRenderer::updateModelMatrices(std::vector<glm::vec3> const& positions)
 {
     modelMatrices.clear();
     for (auto p : positions)

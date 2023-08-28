@@ -13,6 +13,7 @@ public:
     void onPress(int) const;
     void processInput();
     void onMouseButtonPress(int, double, double) const;
+    void onScroll(double, double) const;
     double getMouseX() const;
     double getMouseY() const;
 protected:

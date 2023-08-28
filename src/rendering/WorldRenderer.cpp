@@ -15,7 +15,6 @@
 #include "Window.h"
 #include "ShaderManager.h"
 #include "TextureManager.h"
-#include "ChunkTessellator.h"
 
 WorldRenderer::WorldRenderer()
 {
@@ -30,9 +29,8 @@ WorldRenderer::WorldRenderer()
 
     this->defaultShader = ShaderManager::getDefault();
 
-    this->groundModel = ModelManager::getModel("assets/model/ground.obj");
-
     this->initShadowMap();
+    this->initGBuffer();
 
     this->linesVbo = new VertexBufferObject();
     this->linesVao = new VertexArrayObject();
@@ -58,6 +56,7 @@ void WorldRenderer::render()
 {
     if (this->world != nullptr)
     {
+        glEnable(GL_DEPTH_TEST);
         Player* player = this->world->getPlayer();
 
         this->camera->update(player);
@@ -89,7 +88,7 @@ void WorldRenderer::renderToDepthMap()
 
 void WorldRenderer::renderDefault()
 {
-    glClearColor(0.5f, 0.5f, 0.9f, 1.0f);
+    glClearColor(0.5f, 0.9f, 0.9f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glActiveTexture(GL_TEXTURE1);
     this->depthMap->bind();
@@ -98,57 +97,19 @@ void WorldRenderer::renderDefault()
 
 void WorldRenderer::renderWorld(const Shader* shader, bool shadow)
 {
-    Game::getInstance()->getWorld()->getPlayer()->render(shader);
-
-    this->renderChunks(shader, shadow);
-}
-
-void WorldRenderer::renderChunks(const Shader* shader, bool shadow)
-{
-    TextureManager::tiles->getTexture()->bind();
     shader->use();
-    shader->setInt("texture0", 0);
-    
-    glm::vec3 origin = this->camera->getCenter();
-    std::vector<Chunk*> chunks;
-    world->getNearbyChunks(glm::vec2(origin.x, origin.z), chunks);
-    for (auto chunk : chunks)
-    {
-        glm::ivec2 p = chunk->getChunkPos();
-        glm::mat4 model = glm::mat4(1.0);
-        model = glm::translate(model, glm::vec3(p.x * 16.0, 0.0, p.y * 16.0));
-        shader->setMat4("model", model);
-        chunk->getMesh()->render();
-    }
-
-    for (auto chunk : chunks)
-    {
-        for (int x = 0; x < 16; ++x)
-        {
-            for (int y = 0; y < 16; ++y)
-            {
-                glm::ivec2 p = chunk->getChunkPos();
-                if (chunk->getCrop(x, y) != nullptr)
-                {
-                    glm::mat4 model = glm::mat4(1.0);
-                    model = glm::translate(model, glm::vec3(p.x * 16.0 + x + 0.5, 0.0, p.y * 16.0 + y + 0.5));
-                    shader->setMat4("model", model);
-                    chunk->getCrop(x, y)->getMesh()->render(shader);
-                }
-            }
-        }
-        auto buildings = chunk->getBuildings();
-        for (auto building : buildings) {
-            if (!shadow && building->getAABB().insideXZ(this->camera->getCenter()))
-                continue;
-            building->render(shader);
-        }
-    }
+    this->world->getPlayer()->render(shader);
+    this->world->getRoom()->render(shader);
 }
 
 void WorldRenderer::updateProjection()
 {
     this->projection = glm::perspective(glm::radians(45.0f), (float) Window::getInstance()->getWidth() / (float) Window::getInstance()->getHeight(), 0.1f, 100.0f);
+
+    glBindTexture(GL_TEXTURE_2D, gNormal);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Window::getInstance()->getWidth(), Window::getInstance()->getHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
+    glBindTexture(GL_TEXTURE_2D, gNormal);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Window::getInstance()->getWidth(), Window::getInstance()->getHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
 }
 
 glm::vec3 WorldRenderer::getWorldPos(glm::vec2 const& viewpos) const
@@ -182,6 +143,28 @@ void WorldRenderer::initShadowMap()
     this->depthMapFramebuffer->unbind();
 }
 
+void WorldRenderer::initGBuffer()
+{
+    glGenFramebuffers(1, &gBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
+
+    glGenTextures(1, &gNormal);
+    glBindTexture(GL_TEXTURE_2D, gNormal);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Window::getInstance()->getWidth(), Window::getInstance()->getHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
+
+    glGenTextures(1, &gColor);
+    glBindTexture(GL_TEXTURE_2D, gColor);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Window::getInstance()->getWidth(), Window::getInstance()->getHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gColor, 0);
+
+    unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+    glDrawBuffers(3, attachments);
+}
 
 void WorldRenderer::renderAABB(AABB const& aabb) const
 {
@@ -235,9 +218,7 @@ void WorldRenderer::renderSelected()
 
 glm::vec3 WorldRenderer::getSunPosition() const
 {
-    float t = (float) Game::getInstance()->getWorld()->getTime() / (float) Game::getInstance()->getWorld()->getTimePerDay() * 360.0f * 0.7f;
-
-    return this->camera->getCenter() + glm::vec3(6.0 * glm::cos(glm::radians(t)), 6.0 * glm::sin(glm::radians(t)), -6.0);
+    return this->camera->getCenter() + glm::vec3(1.0, 6.0, -1.0);
 }
 
 glm::mat4 WorldRenderer::getView() const

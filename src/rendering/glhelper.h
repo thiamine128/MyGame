@@ -40,6 +40,7 @@ public:
     void use() const;
     void setInt(const char*, int) const;
     void setVec3(const char*, glm::vec3 const&) const;
+    void setVec4(const char*, glm::vec4 const&) const;
     void setMat4(const char*, glm::mat4 const&) const;
     void setVec2(const char*, glm::vec2 const&) const;
     void setFloat(const char*, float) const;

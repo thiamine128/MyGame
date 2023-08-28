@@ -12,8 +12,6 @@ public:
 
     static void initAtlas();
     static void terminate();
-
-    static TextureAtlas* tiles;
 protected:
     static std::unordered_map<std::string, Texture*> entries;
 };

@@ -46,7 +46,20 @@ void GuiRenderer::renderImage(int x, int y, int w, int h, const Texture* texture
     model = glm::translate(model, glm::vec3(x, y, 0));
     model = glm::scale(model, glm::vec3(w, h, 0));
     shader->setMat4("model", model);
-    this->vao->bind();
+    this->textureVAO->bind();
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
+void GuiRenderer::renderRect(int x1, int y1, int x2, int y2, glm::vec4 const& color)
+{
+    const Shader* shader = ShaderManager::getRect();
+    shader->use();
+    glm::mat4 model = glm::mat4(1.0);
+    model = glm::translate(model, glm::vec3(x1, y1, 0));
+    model = glm::scale(model, glm::vec3(x2 - x1, y2 - y1, 0));
+    shader->setMat4("model", model);
+    shader->setVec4("color", color);
+    this->rectVAO->bind();
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
@@ -75,7 +88,7 @@ void GuiRenderer::renderText(float x, float y, float size, std::string const& te
     const Shader* shader = ShaderManager::getText();
     shader->use();
     glActiveTexture(GL_TEXTURE0);
-    this->vao->bind();
+    this->textureVAO->bind();
     std::string::const_iterator c;
     for (c = text.begin(); c != text.end(); ++c)
     {
@@ -92,7 +105,24 @@ void GuiRenderer::renderText(float x, float y, float size, std::string const& te
 
         x += (ch.advance >> 6) * size;
     }
-    
+}
+
+void GuiRenderer::renderTextCentered(float x, float y, float size, std::string const& text)
+{
+    std::string::const_iterator c;
+    float w = 0.0f, h = 0.0f;
+    float ma = 0.0f, mi = 0.0f;
+    for (c = text.begin(); c != text.end(); ++c)
+    {
+        Character ch = characters[*c];
+        ch.texture->bind();
+
+        if (ch.bearing.y > ma) ma = ch.bearing.y;
+        if (ch.size.y - ch.bearing.y > mi)  mi = ch.size.y - ch.bearing.y;
+        w += (ch.advance >> 6) * size;
+    }
+    h = (mi + ma) * size;
+    this->renderText(x - w / 2.0f, y - h / 2.0f, size, text);
 }
 
 glm::vec2 const& GuiRenderer::getViewport() const
@@ -107,18 +137,27 @@ glm::mat4 const & GuiRenderer::getProjection() const
 
 void GuiRenderer::setupRect()
 {
-    this->vao = new VertexArrayObject();
-    this->vbo = new VertexBufferObject();
-    this->ebo = new ElementBufferObject();
-    this->vao->bind();
-    this->vbo->bind();
-    this->vbo->bufferDataStatic(sizeof(rect), rect);
-    this->ebo->bind();
-    this->ebo->bufferDataStatic(sizeof(indices), indices);
+    this->textureVAO = new VertexArrayObject();
+    this->textureVBO = new VertexBufferObject();
+    this->rectEBO = new ElementBufferObject();
+    this->textureVAO->bind();
+    this->textureVBO->bind();
+    this->textureVBO->bufferDataStatic(sizeof(rect), rect);
+    this->rectEBO->bind();
+    this->rectEBO->bufferDataStatic(sizeof(indices), indices);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (const void*) (3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    this->rectVAO = new VertexArrayObject();
+    this->rectVBO = new VertexBufferObject();
+    this->rectVAO->bind();
+    this->rectVBO->bind();
+    this->rectVBO->bufferDataStatic(sizeof(rect), rect);
+    this->rectEBO->bind();
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
+    glEnableVertexAttribArray(0);
 }
 
 void GuiRenderer::initFont()

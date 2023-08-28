@@ -16,6 +16,7 @@ public:
     float getMaxZ() const;
     bool insideXZ(glm::vec3 const&) const;
     AABB offset(glm::vec3 const&) const;
+    AABB inflate(glm::vec3 const&) const;
 protected:
     glm::vec3 min, max;
 };

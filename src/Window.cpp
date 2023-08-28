@@ -38,6 +38,7 @@ void Window::init(int width, int height, const char* title)
     glfwSetFramebufferSizeCallback(this->window, framebufferSizeCallback);
     glfwSetKeyCallback(this->window, keyCallback);
     glfwSetMouseButtonCallback(this->window, mouseButtonCallback);
+    glfwSetScrollCallback(this->window, scrollCallback);
 }
 
 Window::~Window()
@@ -128,4 +129,9 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
         glfwGetCursorPos(window, &x, &y);
         Game::getInstance()->getController()->onMouseButtonPress(button, x, y);
     }
+}
+
+void scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
+{
+    Game::getInstance()->getController()->onScroll(xOffset, yOffset);
 }

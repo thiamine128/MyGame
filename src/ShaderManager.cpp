@@ -12,6 +12,7 @@ Shader* ShaderManager::lineShader = nullptr;
 Shader* ShaderManager::guiShader = nullptr;
 Shader* ShaderManager::guiModelShader = nullptr;
 Shader* ShaderManager::textShader = nullptr;
+Shader* ShaderManager::rectShader = nullptr;
 
 void ShaderManager::load()
 {
@@ -22,6 +23,7 @@ void ShaderManager::load()
     guiShader = new Shader("assets/shader/gui.vsh", "assets/shader/gui.fsh");
     guiModelShader = new Shader("assets/shader/gui_model.vsh", "assets/shader/gui_model.fsh");
     textShader = new Shader("assets/shader/text.vsh", "assets/shader/text.fsh");
+    rectShader = new Shader("assets/shader/rect.vsh", "assets/shader/rect.fsh");
 }
 
 void ShaderManager::terminate()
@@ -64,11 +66,14 @@ const Shader * ShaderManager::getText()
     return textShader;
 }
 
+const Shader *ShaderManager::getRect()
+{
+    return rectShader;
+}
+
 void ShaderManager::setupUniforms(const WorldRenderer* renderer)
 {
     defaultShader->use();
-    float t = (float) Game::getInstance()->getWorld()->getTime() / (float) Game::getInstance()->getWorld()->getTimePerDay();
-    defaultShader->setFloat("time", t);
     defaultShader->setMat4("view", renderer->getView());
     defaultShader->setMat4("lightSpace", renderer->getLightSpace());
     defaultShader->setVec3("lightPos", renderer->getSunPosition());
@@ -87,15 +92,18 @@ void ShaderManager::initUniforms(const WorldRenderer* renderer, const GuiRendere
     defaultShader->use();
     defaultShader->setInt("shadowMap", 1);
     defaultShader->setMat4("projection", renderer->getProjection());
+    defaultShader->setVec4("color", glm::vec4(1.0));
     instanceDefaultShader->use();
     instanceDefaultShader->setInt("shadowMap", 1);
     instanceDefaultShader->setMat4("projection", renderer->getProjection());
     lineShader->use();
     lineShader->setMat4("projection", renderer->getProjection());
     guiShader->use();
-    guiModelShader->setMat4("projection", gui->getProjection());
+    guiShader->setMat4("projection", gui->getProjection());
     guiModelShader->use();
     guiModelShader->setMat4("projection", gui->getProjection());
     textShader->use();
     textShader->setMat4("projection", gui->getProjection());
+    rectShader->use();
+    rectShader->setMat4("projection", gui->getProjection());
 }

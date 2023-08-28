@@ -6,11 +6,8 @@ class World;
 class FramebufferObject;
 
 #include "rendering/glhelper.h"
-#include "world/World.h"
-#include "world/crop/Crop.h"
 #include "InstancedRenderer.h"
 #include "util/AABB.h"
-#include "world/construction/ConstructionType.h"
 
 #include <unordered_map>
 #include <glm/gtc/type_ptr.hpp>
@@ -44,12 +41,13 @@ protected:
     VertexArrayObject* linesVao;
     VertexBufferObject* linesVbo;
     ElementBufferObject* linesEbo;
+    GLuint gBuffer, gColor, gNormal;
     
     void renderToDepthMap();
     void renderDefault();
     void renderWorld(const Shader*, bool);
-    void renderChunks(const Shader*, bool);
     void initShadowMap();
+    void initGBuffer();
     void renderAABB(AABB const&) const;
     void renderSelected();
 };

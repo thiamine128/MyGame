@@ -9,14 +9,11 @@ class InstancedRenderer
 {
 public:
     InstancedRenderer(const Mesh*);
-    void reset();
-    void addInstance(glm::vec3);
-    void updateModelMatrices();
+    void updateModelMatrices(std::vector<glm::vec3> const&);
 
     void render(const Shader*);
 protected:
     const Mesh* mesh;
     VertexBufferObject* vbo;
     std::vector<glm::mat4> modelMatrices;
-    std::vector<glm::vec3> positions;
 };

@@ -57,3 +57,8 @@ AABB AABB::offset(glm::vec3 const& off) const
 {
     return AABB(this->min + off, this->max + off);
 }
+
+AABB AABB::inflate(glm::vec3 const& off) const
+{
+    return AABB(min - off ,max + off);
+}

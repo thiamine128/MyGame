@@ -179,6 +179,10 @@ void Shader::setVec3(const char* name, glm::vec3 const& value) const
     glUniform3fv(glGetUniformLocation(this->id, name), 1, &value[0]);
 }
 
+void Shader::setVec4(const char* name, glm::vec4 const& value) const
+{
+    glUniform4fv(glGetUniformLocation(this->id, name), 1, &value[0]);
+}
 
 Texture::Texture()
 {
@@ -198,7 +202,7 @@ Texture::~Texture()
 
 void Texture::loadImage(const char* path)
 {
-    unsigned char* data = stbi_load(path, &(this->width), &(this->height), &(this->nrChannels), STBI_rgb);
+    unsigned char* data = stbi_load(path, &(this->width), &(this->height), &(this->nrChannels), STBI_rgb_alpha);
 
     if (data) {
         
@@ -210,7 +214,7 @@ void Texture::loadImage(const char* path)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->width, this->height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this->width, this->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     } else {
         std::cout << "Failed to load image : " << path << "." << std::endl;

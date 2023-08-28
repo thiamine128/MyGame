@@ -5,8 +5,8 @@
 #include "ShaderManager.h"
 #include "Window.h"
 #include "world/World.h"
+#include "world/Items.h"
 #include "Controller.h"
-#include "rendering/ChunkTessellator.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -27,9 +27,7 @@ void Game::initRendering()
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
         std::cout << "Failed to load glad." << std::endl;
     }
-    glEnable(GL_DEPTH_TEST);
     TextureManager::initAtlas();
-    ChunkTessellator::initConstructionModels();
 }
 
 Game::~Game() {
@@ -51,19 +49,20 @@ void Game::init() {
 
 
     this->initRendering();
-
+    Item::init();
+    
     this->renderer = new WorldRenderer();
-    this->world = new World();
+    
     this->controller = new Controller();
     this->currentFrame = this->lastFrame = this->deltaTime = 0.0f;
     this->gui = new GuiRenderer();
     this->screenManager = new ScreenManager(this->gui);
 
-    this->screenManager->pushGameScreen();
-
     ShaderManager::initUniforms(this->renderer, this->gui);
-
-    this->renderer->setWorld(this->world);
+    
+    this->world = nullptr;
+    this->newGame();
+    this->screenManager->pushGameScreen();
 }
 
 void Game::run() {
@@ -86,32 +85,36 @@ void Game::run() {
         }
 
         this->controller->processInput();
+
+        bool pushFail = false;
         
-        while (deltaTime > this->tickRate) {
+        while (deltaTime > this->tickRate && this->world != nullptr && this->world->getPlayer()->getHealth() > 0) {
             deltaTime -= this->tickRate;
             this->world->tick();
+
+            if (this->world->getPlayer()->getHealth() <= 0)
+            {
+                pushFail = true;
+            }
         }
 
         ImGui::Begin("Debug");
         ImGui::Text("FPS: %d", this->fps);
-        if (ImGui::Button("nextDay"))
-        {
-            this->world->nextDay();
-        }
-        ImGui::Text("Time: %d", this->world->getTime());
-        for (int i = 0; i < INV_SIZE; ++i) {
-            ItemStack const& is = this->world->getPlayer()->getSlot(i);
-            ImGui::Text("%s : %d", is.item == nullptr ? "None" : is.item->getName().c_str(), is.cnt);
-        }
-        
         ImGui::End();
         
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         this->screenManager->render();
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         Window::getInstance()->swapBuffers();
         Window::getInstance()->pollEvents();
+
+        if (pushFail)
+        {
+            this->screenManager->pushFailedScreen();
+        }
     }
 }
 
@@ -135,6 +138,11 @@ GuiRenderer *Game::getGui() const
     return this->gui;
 }
 
+ScreenManager *Game::getScreenManager() const
+{
+    return this->screenManager;
+}
+
 float Game::getDeltaTime() const
 {
     return this->deltaTime;
@@ -143,6 +151,16 @@ float Game::getDeltaTime() const
 float Game::getFrameTime() const
 {
     return this->currentFrame;
+}
+
+void Game::newGame()
+{
+    if (this->world != nullptr)
+    {
+        delete this->world;
+    }
+    this->world = new World();
+    this->renderer->setWorld(this->world);
 }
 
 Game* Game::getInstance() {

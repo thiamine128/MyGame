@@ -1,155 +1,123 @@
 #include "Player.h"
 
 #include "Game.h"
-
-#include <iostream>
-
 #include "ModelManager.h"
+#include "Bullet.h"
 
+#include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-Player::Player(World* world)
+#include <iostream>
+Player::Player(World* world) : Entity(world, glm::vec3(0.0), AABB({0, 0, 0}, {0.8, 2, 0.8}))
 {
-    this->pos = glm::vec3(0.0);
-    this->velocity = glm::vec3(0.0);
-    this->world = world;
 
-    this->model = ModelManager::getModel("assets/model/stickman.obj");
+    this->model = ModelManager::getModel("assets/models/peashooter.obj");
 
-    this->gain({Item::hoe, 1});
-    this->gain({Item::potatoSeeds, 10});
-    this->gain({Item::planks, 128});
-    this->gain({Item::fence, 128});
-    this->selectedSlot = 0;
+    this->shootSpeed = 10;
+    this->shotCooldown = 0;
+    this->health = 3.0f;
+    this->speed = 3.0f;
+    this->immuneTicks = 0;
+    this->atk = 1.0;
+    this->range = 1.0f;
 }
 
 Player::~Player()
 {
 }
 
-glm::vec3 Player::getPosFrame() const
+void Player::shoot(int dir)
 {
-    return glm::mix(this->prevPos, this->pos, Game::getInstance()->getDeltaTime() / 0.05f);
-}
-
-glm::vec3 Player::getPos() const
-{
-    return this->pos;
-}
-
-glm::vec3 Player::getVelocity() const
-{
-    return this->velocity;
-}
-
-void Player::setVelocity(glm::vec3 const& velocity)
-{
-    this->velocity = velocity;
-}
-
-void Player::render(Shader const* shader) const
-{
-    shader->use();
-    glm::mat4 model = glm::mat4(1.0f);
-    
-    model = glm::translate(model, this->getPosFrame());
-
-    glm::vec3 t = this->getPosFrame();
-    
-    shader->setMat4("model", model);
-
-    this->model->render(shader);
+    glm::vec3 v0[] = 
+    {
+        {0.0, 0.0, -1.0},
+        {-1.0, 0.0, 0.0},
+        {0.0, 0.0, 1.0},
+        {1.0, 0.0, 0.0}
+    };
+    if (this->shotCooldown <= 0)
+    {
+        auto bullet = new Bullet(this->world, this->pos + glm::vec3(0.0, 0.7, 0.0), this->velocity * 0.2f + 4.0f * v0[dir], 0.3f);
+        Bullet::apply(bullet, this, this->items);
+        this->world->getRoom()->addEntity(bullet);
+        this->shotCooldown = this->shootSpeed;
+    }
+    this->rotation = glm::radians(90.0f * dir);
 }
 
 void Player::tick()
 {
-    this->velocity = Game::getInstance()->getController()->getVelocity();
-    glm::vec3 nextPos = this->pos + this->velocity * 0.05f;
-    std::vector<Chunk*> chunks;
-    this->world->getNearbyChunks(glm::vec2(this->pos.x, this->pos.z), chunks);
-    bool collided = false;
-    for (auto chunk : chunks)
+    Controller* controller = Game::getInstance()->getController();
+    this->velocity = controller->getVelocity() * this->speed;
+    Entity::tick();
+    if (shotCooldown > 0) --shotCooldown;
+    if (controller->isKeyPressed(GLFW_KEY_LEFT))
     {
-        if (chunk->collide(this->getAABB(nextPos)))
-        {
-            collided = true;
-            break;
-        }
-    }
-
-    this->prevPos = this->pos;
-    if (!collided)
+        this->shoot(3);
+    } else if (controller->isKeyPressed(GLFW_KEY_RIGHT))
     {
-        this->pos = nextPos;
-    }
-}
-
-void Player::plow()
-{
-    if (this->world->getTile(this->pos.x, this->pos.z) == TileType::Plowland)
+        this->shoot(1);
+    } else if (controller->isKeyPressed(GLFW_KEY_UP))
     {
-        const Crop* crop = this->world->getCrop(this->pos.x, this->pos.z);
-        if (crop != nullptr && crop->getStage() == crop->getMaxStage())
-        {
-            this->world->harvest(this->pos.x, this->pos.z);
-            this->gain({Item::potato, 1});
-        } else
-        {
-            this->world->sow(this->pos.x, this->pos.z, CropProperties::potato);
-        }
+        this->shoot(2);
+    } else if (controller->isKeyPressed(GLFW_KEY_DOWN))
+    {
+        this->shoot(0);
     }
-    else
-        this->world->setTile(this->pos.x, this->pos.z, TileType::Plowland);
+    if (this->immuneTicks > 0)
+    {
+        this->immuneTicks --;
+    }
 }
 
-void Player::gain(ItemStack const& itemStack)
+void Player::gainItem(Item* item)
 {
-    this->inventory.gain(itemStack);
+    this->items.push_back(item);
+    Item::onPickup(item, this);
 }
 
-void Player::decreaseItemCnt()
+int Player::getHearts()
 {
-    this->inventory.decrease(this->getSelectedSlot());
+    return 6;
 }
 
-ItemStack const &Player::getSlot(int i) const
+int Player::getHealth()
 {
-    return this->inventory.getSlot(i);
+    return this->health * 2;
 }
 
-AABB Player::getAABB() const
+double Player::getAtk() const
 {
-    return this->getAABB(this->pos);
+    return this->atk;
 }
 
-AABB Player::getAABB(glm::vec3 const& pos) const
+float Player::getRange() const
 {
-    return AABB(pos - glm::vec3(0.5, 0.0, 0.5), pos + glm::vec3(0.5, 2.0, 0.5));
+    return this->range;
 }
 
-Inventory* Player::getInventory()
+void Player::addAtk(double v)
 {
-    return &(this->inventory);
+    this->atk += v;
 }
 
-ItemStack const &Player::getSelectedItem() const
+void Player::addRange(float v)
 {
-    return this->inventory.getSlot(selectedSlot);
+    this->range += v;
 }
 
-int Player::getSelectedSlot() const
+void Player::addShootSpeed(int ticks)
 {
-    return this->selectedSlot;
+    this->shootSpeed -= ticks;
 }
 
-void Player::selectItem(int i)
+void Player::hurt(double d)
 {
-    this->selectedSlot = i;
-}
-
-World *Player::getWorld() const
-{
-    return this->world;
+    if (this->immuneTicks <= 0)
+    {
+        this->health -= d;
+        this->immuneTicks = 40;
+    }
 }

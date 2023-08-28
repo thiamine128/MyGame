@@ -31,8 +31,8 @@ void Camera::setUp(glm::vec3& value)
 
 void Camera::update(Player* player)
 {
-    this->pos = player->getPosFrame() + glm::vec3(0.0, 8.0, -8.0);
-    this->center = player->getPosFrame();
+    this->pos = glm::vec3(0.0) + glm::vec3(0.0, 16.0, -6.0);
+    this->center = glm::vec3(0.0);
     this->view = glm::lookAt(pos, center, up);
 }
 

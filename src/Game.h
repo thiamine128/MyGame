@@ -20,8 +20,10 @@ public:
     Controller* getController() const;
     World* getWorld() const;
     GuiRenderer* getGui() const;
+    ScreenManager* getScreenManager() const;
     float getDeltaTime() const;
     float getFrameTime() const;
+    void newGame();
 
     static Game* getInstance();
     static void terminate();
