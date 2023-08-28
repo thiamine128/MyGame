@@ -46,7 +46,7 @@ void Controller::onPress(int key) const
 
 void Controller::processInput()
 {
-    glfwGetCursorPos(Window::getInstance()->getWindow(), &(this->mouseX), &(this->mouseY));
+
 }
 
 void Controller::onMouseButtonPress(int button, double x, double y) const
@@ -60,6 +60,13 @@ void Controller::onMouseButtonPress(int button, double x, double y) const
 void Controller::onScroll(double xOff, double yOff) const
 {
     Game::getInstance()->getScreenManager()->handleScroll(this->mouseX, Window::getInstance()->getHeight() - this->mouseY, yOff);
+}
+
+void Controller::onCursorMove(double x, double y)
+{
+    this->mouseX = x;
+    this->mouseY = y;
+    Game::getInstance()->getScreenManager()->onCursorMove(mouseX, Window::getInstance()->getHeight() - mouseY);
 }
 
 double Controller::getMouseX() const

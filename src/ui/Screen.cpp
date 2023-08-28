@@ -1,5 +1,7 @@
 #include "Screen.h"
 
+#include <iostream>
+
 Screen::Screen(GuiRenderer* guiRenderer) : guiRenderer(guiRenderer)
 {
     this->escapable = false;
@@ -51,6 +53,24 @@ void Screen::handleKeyPress(int)
 {
 }
 
+void Screen::handleMouseMove(double x, double y)
+{
+    for (auto g : guiElements)
+    {
+        if (g->getRect().inside(glm::ivec2(x, y)))
+        {
+            g->focus();
+        } else
+        {
+            g->unfocus();
+        }
+    }
+}
+
+void Screen::handleResize(int w, int h)
+{
+}
+
 bool Screen::isEscapable() const
 {
     return this->escapable;
@@ -59,4 +79,9 @@ bool Screen::isEscapable() const
 bool Screen::shouldRenderPrev() const
 {
     return this->renderPrev;
+}
+
+int Screen::getType() const
+{
+    return this->screenType;
 }

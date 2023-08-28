@@ -65,11 +65,11 @@ void WorldRenderer::render()
 
         glViewport(0, 0, this->shadowWidth, this->shadowHeight);
         this->renderToDepthMap();
-        
         glViewport(0, 0, Window::getInstance()->getWidth(), Window::getInstance()->getHeight());
+        
+        glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
         this->renderDefault();
-
-        this->renderSelected();
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }  
 }
 
@@ -108,8 +108,10 @@ void WorldRenderer::updateProjection()
 
     glBindTexture(GL_TEXTURE_2D, gNormal);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Window::getInstance()->getWidth(), Window::getInstance()->getHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
-    glBindTexture(GL_TEXTURE_2D, gNormal);
+    glBindTexture(GL_TEXTURE_2D, gColor);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Window::getInstance()->getWidth(), Window::getInstance()->getHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
+    glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, Window::getInstance()->getWidth(), Window::getInstance()->getHeight());
 }
 
 glm::vec3 WorldRenderer::getWorldPos(glm::vec2 const& viewpos) const
@@ -153,7 +155,7 @@ void WorldRenderer::initGBuffer()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Window::getInstance()->getWidth(), Window::getInstance()->getHeight(), 0, GL_RGBA, GL_FLOAT, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gNormal, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, gNormal, 0);
 
     glGenTextures(1, &gColor);
     glBindTexture(GL_TEXTURE_2D, gColor);
@@ -162,8 +164,15 @@ void WorldRenderer::initGBuffer()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, gColor, 0);
 
-    unsigned int attachments[3] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
-    glDrawBuffers(3, attachments);
+    unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+    glDrawBuffers(2, attachments);
+
+    glGenRenderbuffers(1, &rboDepth);
+    glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, Window::getInstance()->getWidth(), Window::getInstance()->getHeight());
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void WorldRenderer::renderAABB(AABB const& aabb) const
@@ -234,4 +243,12 @@ glm::mat4 WorldRenderer::getLightSpace() const
 glm::mat4 WorldRenderer::getProjection() const
 {
     return this->projection;
+}
+
+void WorldRenderer::bindPostTex()
+{
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, gNormal);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, gColor);
 }

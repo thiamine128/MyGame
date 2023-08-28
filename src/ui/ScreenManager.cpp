@@ -2,7 +2,10 @@
 
 #include "GameScreen.h"
 #include "FailedScreen.h"
+#include "MenuScreen.h"
+#include "PauseScreen.h"
 #include "Game.h"
+#include "Window.h"
 
 ScreenManager::ScreenManager(GuiRenderer* guiRenderer) : guiRenderer(guiRenderer)
 {
@@ -56,6 +59,16 @@ void ScreenManager::pushFailedScreen()
     this->screens[++(this->stackTop)] = new FailedScreen(this->guiRenderer);
 }
 
+void ScreenManager::pushMenuScreen()
+{
+    this->screens[++(this->stackTop)] = new MenuScreen(this->guiRenderer);
+}
+
+void ScreenManager::pushPauseScreen()
+{
+    this->screens[++(this->stackTop)] = new PauseScreen(this->guiRenderer);
+}
+
 void ScreenManager::escape()
 {
     if (this->getTopScreen() != nullptr)
@@ -65,6 +78,16 @@ void ScreenManager::escape()
             this->popScreen();
         }
     }
+}
+
+void ScreenManager::onCursorMove(double x, double y)
+{
+    this->getTopScreen()->handleMouseMove(x, y);
+}
+
+bool ScreenManager::inGameScreen() const
+{
+    return this->getTopScreen()->getType() == 1;
 }
 
 void ScreenManager::handleClick(int x, int y) const
@@ -89,4 +112,10 @@ void ScreenManager::handleKeyPress(int key) const
     {
         this->getTopScreen()->handleKeyPress(key);
     }
+}
+
+void ScreenManager::handleResize(int w, int h)
+{
+    for (int i = 0; i <= stackTop; ++i)
+        screens[i]->handleResize(w, h);
 }

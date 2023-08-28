@@ -29,13 +29,14 @@ Room *LayerGenerator::generateRooms(World* world, int num, int stage)
         pq.pop();
         int x = std::get<1>(c), y = std::get<2>(c);
         std::string layoutId = "0";
+        int flag = 0;
         if (cnt + 1 == num)
         {
-            layoutId = "boss";
+            layoutId = "boss", flag |= 1;
         } else if (cnt > 1)
             layoutId = std::to_string(layout(rng));
         
-        m[x][y] = new Room(world, "assets/rooms/" + std::to_string(stage) + "/" + layoutId + ".layout", stage);
+        m[x][y] = new Room(world, "assets/rooms/" + std::to_string(stage) + "/" + layoutId + ".layout", stage, flag);
         ++cnt;
         if (valid(x, y))
         {

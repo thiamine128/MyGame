@@ -12,4 +12,8 @@ public:
     virtual void handleKeyPress(int);
 protected:
     WorldRenderer* worldRenderer;
+    bool shouldRenderMap;
+
+    void renderMap(int, float) const;
+    void renderItemHint() const;
 };

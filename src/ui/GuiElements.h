@@ -17,25 +17,31 @@ public:
 class GuiElement
 {
 public:
-    GuiElement(Rect const&);
+    GuiElement();
 
     Rect const& getRect() const;
     virtual void onClick(int, int);
     virtual void render(GuiRenderer*);
     virtual void onScroll(double);
+    void resize(Rect const&);
+
+    void focus();
+    void unfocus();
 protected:
     Rect rect;
+    bool focused;
 };
 
 class Button : public GuiElement
 {
 public:
-    Button(Rect const&, std::string const&, std::function<void()>);
+    Button(std::string const&, float, std::function<void()>);
 
     virtual void onClick(int, int);
     virtual void render(GuiRenderer*);
     virtual void onScroll(double);
 protected:
     std::string text;
+    float textSize;
     std::function<void()> func;
 };

@@ -19,14 +19,17 @@ public:
     int getHealth();
     double getAtk() const;
     float getRange() const;
+    void setTripleShot();
     void addAtk(double);
     void addRange(float);
     void addShootSpeed(int);
     void hurt(double);
+    void heal();
 protected:
     int shotCooldown;
     int immuneTicks;
     int shootSpeed;
+    bool tripleShot;
     double atk;
     float range;
     std::vector<Item*> items;

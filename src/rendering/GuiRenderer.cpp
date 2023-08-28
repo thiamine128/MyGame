@@ -5,6 +5,7 @@
 #include "ModelManager.h"
 #include "Window.h"
 #include "Game.h"
+#include "WorldRenderer.h"
 
 #include <iostream>
 #include <ft2build.h>
@@ -63,6 +64,19 @@ void GuiRenderer::renderRect(int x1, int y1, int x2, int y2, glm::vec4 const& co
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
 
+void GuiRenderer::renderPost(WorldRenderer* worldRenderer)
+{
+    const Shader* shader = ShaderManager::getPost();
+    shader->use();
+    worldRenderer->bindPostTex();
+    glm::mat4 model = glm::mat4(1.0);
+    model = glm::translate(model, glm::vec3(0, 0, 0));
+    model = glm::scale(model, glm::vec3(Window::getInstance()->getWidth(), Window::getInstance()->getHeight(), 0));
+    shader->setMat4("model", model);
+    this->textureVAO->bind();
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+}
+
 void GuiRenderer::renderGuiModel(int x, int y, int size, const Model* model, glm::mat4 const& modelMatrix)
 {
     const Shader* shader = ShaderManager::getGuiModel();
@@ -83,13 +97,14 @@ void GuiRenderer::updateViewport()
     this->projection = glm::ortho(0.0f, this->viewport.x, 0.0f, this->viewport.y, -100.0f, 100.0f);
 }
 
-void GuiRenderer::renderText(float x, float y, float size, std::string const& text)
+void GuiRenderer::renderText(float x, float y, float size, std::string const& text, glm::vec4 const& color)
 {
     const Shader* shader = ShaderManager::getText();
     shader->use();
     glActiveTexture(GL_TEXTURE0);
     this->textureVAO->bind();
     std::string::const_iterator c;
+    shader->setVec4("color", color);
     for (c = text.begin(); c != text.end(); ++c)
     {
         Character ch = characters[*c];
@@ -99,12 +114,19 @@ void GuiRenderer::renderText(float x, float y, float size, std::string const& te
         model = glm::translate(model, glm::vec3(xPos, yPos, 0.0));
         model = glm::scale(model, glm::vec3(ch.size.x * size, ch.size.y * size, 0));
 
+        
         shader->setMat4("model", model);
         ch.texture->bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
+        
         x += (ch.advance >> 6) * size;
     }
+    shader->setVec4("color", glm::vec4(1.0));
+}
+
+void GuiRenderer::renderText(float x, float y, float size, std::string const& text)
+{
+    renderText(x, y, size, text, glm::vec4(1.0));
 }
 
 void GuiRenderer::renderTextCentered(float x, float y, float size, std::string const& text)
@@ -168,7 +190,7 @@ void GuiRenderer::initFont()
     {
         std::cout << "Failed to load freetype." << std::endl;
     }
-    if (FT_New_Face(ft, "assets/fonts/arial.ttf", 0, &face))
+    if (FT_New_Face(ft, "assets/fonts/DeliciousHandrawn-Regular.ttf", 0, &face))
     {
         std::cout << "Failed to load font." << std::endl;
     }

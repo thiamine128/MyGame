@@ -1,11 +1,14 @@
 #version 330 core
 
+layout (location = 0) out vec3 gNormal;
+layout (location = 1) out vec3 gColor;
+
 in vec2 TexCoord;
 in vec4 PosLightSpace;
 in vec3 Normal;
 in vec3 Pos;
 
-out vec4 FragColor;
+
 
 uniform sampler2D texture0;
 uniform sampler2D shadowMap;
@@ -40,6 +43,7 @@ float calcShadow(vec4 pos) {
 
 void main()
 {
-    FragColor = color;
-    FragColor.rgb *= texture(texture0, TexCoord).rgb * calcShadow(PosLightSpace);
+    gNormal = normalize(Normal);
+    gColor = color.rgb;
+    gColor *= texture(texture0, TexCoord).rgb * calcShadow(PosLightSpace);
 }

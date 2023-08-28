@@ -19,6 +19,7 @@ public:
 
     Player* getPlayer() const;
     Room* getRoom() const;
+    Room* getRoom(int, int) const;
     void setRoom(Room*);
     void tick();
     void nextStage();
@@ -26,6 +27,7 @@ public:
 protected:
     Player* player;
     Room* room;
+    Room* grid[13][13];
     int stage;
     bool prepareNext;
 };

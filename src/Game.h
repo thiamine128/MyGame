@@ -24,6 +24,9 @@ public:
     float getDeltaTime() const;
     float getFrameTime() const;
     void newGame();
+    void startNewGame();
+    void pause();
+    void continueGame();
 
     static Game* getInstance();
     static void terminate();
@@ -37,6 +40,7 @@ protected:
     float fpsLastTime;
     int frameCnt;
     int fps;
+    bool paused;
     
     Game();
 

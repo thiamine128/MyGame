@@ -61,8 +61,8 @@ void Game::init() {
     ShaderManager::initUniforms(this->renderer, this->gui);
     
     this->world = nullptr;
-    this->newGame();
-    this->screenManager->pushGameScreen();
+    this->screenManager->pushMenuScreen();
+    this->paused = false;
 }
 
 void Game::run() {
@@ -90,7 +90,9 @@ void Game::run() {
         
         while (deltaTime > this->tickRate && this->world != nullptr && this->world->getPlayer()->getHealth() > 0) {
             deltaTime -= this->tickRate;
-            this->world->tick();
+
+            if (!paused)
+                this->world->tick();
 
             if (this->world->getPlayer()->getHealth() <= 0)
             {
@@ -161,6 +163,24 @@ void Game::newGame()
     }
     this->world = new World();
     this->renderer->setWorld(this->world);
+}
+
+void Game::startNewGame()
+{
+    this->newGame();
+    this->screenManager->pushGameScreen();
+}
+
+void Game::pause()
+{
+    this->paused = true;
+    this->screenManager->pushPauseScreen();
+}
+
+void Game::continueGame()
+{
+    this->paused = false;
+    this->screenManager->popScreen();
 }
 
 Game* Game::getInstance() {

@@ -48,19 +48,23 @@ void Bullet::tick()
     {
         this->velocity.y -= 0.15;
     }
+    if (this->isTracking())
+    {
+        // TODO: tracking
+    }
     Entity::tick();
 
     Entity* hit = this->world->getRoom()->hitEnermy(this->getAABB());
     if (hit != nullptr)
     {
         if (!this->isPierce())
-            this->onCollide();
+            this->onCollide(0);
         this->onHit(hit);
     }
     this->setRotation(glm::atan(this->velocity.x, this->velocity.z));
 }
 
-void Bullet::onCollide()
+void Bullet::onCollide(int)
 {
     this->remove();
 }
@@ -119,6 +123,11 @@ void Bullet::setPierce()
     this->flag[2] = 1;
 }
 
+void Bullet::setTracking()
+{
+    this->flag[3] = 1;
+}
+
 void Bullet::addDamage(float damage)
 {
     this->damage += damage;
@@ -137,6 +146,11 @@ bool Bullet::isFrozen() const
 bool Bullet::isPierce() const
 {
     return this->flag[2];
+}
+
+bool Bullet::isTracking() const
+{
+    return this->flag[3];
 }
 
 void Bullet::doDamage(Entity* e)
@@ -169,6 +183,9 @@ void Bullet::apply(Bullet* bullet, Player* player, std::vector<Item*> const& ite
         {
             bullet->setPierce();
             bullet->model = ModelManager::getModel("assets/models/peaarrow.obj");
+        } else if (item == Item::magician)
+        {
+            bullet->setTracking();
         }
     }
 
@@ -212,13 +229,13 @@ void EnemyBullet::tick()
     if (this->world->getPlayer()->getAABB().collideWith(this->getAABB()))
     {
         this->world->getPlayer()->hurt(0.5f);
-        this->onCollide();
+        this->onCollide(0);
     }
     
     this->setRotation(glm::atan(this->velocity.x, this->velocity.z));
 }
 
-void EnemyBullet::onCollide()
+void EnemyBullet::onCollide(int)
 {
     this->remove();
 }

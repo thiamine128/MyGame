@@ -18,6 +18,7 @@ public:
     static const Shader* getGuiModel();
     static const Shader* getText();
     static const Shader* getRect();
+    static const Shader* getPost();
     static void setupUniforms(const WorldRenderer*);
     static void initUniforms(const WorldRenderer*, const GuiRenderer*);
 protected:
@@ -29,4 +30,5 @@ protected:
     static Shader* guiModelShader;
     static Shader* textShader;
     static Shader* rectShader;
+    static Shader* postShader;
 };

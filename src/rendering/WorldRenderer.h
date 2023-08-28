@@ -28,6 +28,7 @@ public:
     glm::mat4 getView() const;
     glm::mat4 getLightSpace() const;
     glm::mat4 getProjection() const;
+    void bindPostTex();
 protected:
     World* world;
     Camera* camera;
@@ -41,7 +42,7 @@ protected:
     VertexArrayObject* linesVao;
     VertexBufferObject* linesVbo;
     ElementBufferObject* linesEbo;
-    GLuint gBuffer, gColor, gNormal;
+    GLuint gBuffer, gColor, gNormal, rboDepth;
     
     void renderToDepthMap();
     void renderDefault();

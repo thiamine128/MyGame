@@ -12,9 +12,19 @@ bool Rect::inside(glm::ivec2 const& pos) const
         && pos.y >= lb.y && pos.y <= rt.y;
 }
 
-GuiElement::GuiElement(Rect const& rect) : rect(rect)
+GuiElement::GuiElement() : rect({0, 0}, {0, 0})
 {
 
+}
+
+void GuiElement::focus()
+{
+    this->focused = true;
+}
+
+void GuiElement::unfocus()
+{
+    this->focused = false;
 }
 
 Rect const &GuiElement::getRect() const
@@ -34,7 +44,12 @@ void GuiElement::onScroll(double)
 {
 }
 
-Button::Button(Rect const& rect, std::string const& text, std::function<void()> func) : GuiElement(rect), text(text), func(func)
+void GuiElement::resize(Rect const& rect)
+{
+    this->rect = rect;
+}
+
+Button::Button(std::string const& text, float textSize, std::function<void()> func) : text(text), func(func), textSize(textSize)
 {
 
 }
@@ -46,11 +61,10 @@ void Button::onClick(int x, int y)
 
 void Button::render(GuiRenderer* guiRenderer)
 {
-    guiRenderer->renderRect(rect.lb.x, rect.lb.y, rect.rt.x, rect.rt.y, glm::vec4(1.0));
-    guiRenderer->renderTextCentered((rect.lb.x + rect.rt.x) >> 1, (rect.lb.y + rect.rt.y) >> 1, 0.5f, this->text);
+    guiRenderer->renderTextCentered((rect.lb.x + rect.rt.x) >> 1, (rect.lb.y + rect.rt.y) >> 1, this->textSize + (focused ? 0.5f : 0.0f), this->text);
 }
 
 void Button::onScroll(double yOff)
 {
-    std::cout << "Scroll : " << yOff << std::endl;
+    
 }

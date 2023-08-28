@@ -4,6 +4,7 @@
 #include "rendering/WorldRenderer.h"
 #include "rendering/Camera.h"
 #include "rendering/GuiRenderer.h"
+#include "Window.h"
 
 Shader* ShaderManager::defaultShader = nullptr;
 Shader* ShaderManager::instanceDefaultShader = nullptr;
@@ -13,6 +14,7 @@ Shader* ShaderManager::guiShader = nullptr;
 Shader* ShaderManager::guiModelShader = nullptr;
 Shader* ShaderManager::textShader = nullptr;
 Shader* ShaderManager::rectShader = nullptr;
+Shader* ShaderManager::postShader = nullptr;
 
 void ShaderManager::load()
 {
@@ -24,6 +26,7 @@ void ShaderManager::load()
     guiModelShader = new Shader("assets/shader/gui_model.vsh", "assets/shader/gui_model.fsh");
     textShader = new Shader("assets/shader/text.vsh", "assets/shader/text.fsh");
     rectShader = new Shader("assets/shader/rect.vsh", "assets/shader/rect.fsh");
+    postShader = new Shader("assets/shader/post.vsh", "assets/shader/post.fsh");
 }
 
 void ShaderManager::terminate()
@@ -71,6 +74,11 @@ const Shader *ShaderManager::getRect()
     return rectShader;
 }
 
+const Shader *ShaderManager::getPost()
+{
+    return postShader;
+}
+
 void ShaderManager::setupUniforms(const WorldRenderer* renderer)
 {
     defaultShader->use();
@@ -104,6 +112,13 @@ void ShaderManager::initUniforms(const WorldRenderer* renderer, const GuiRendere
     guiModelShader->setMat4("projection", gui->getProjection());
     textShader->use();
     textShader->setMat4("projection", gui->getProjection());
+    textShader->setVec4("color", glm::vec4(1.0));
     rectShader->use();
     rectShader->setMat4("projection", gui->getProjection());
+    postShader->use();
+    postShader->setInt("gNormal", 0);
+    postShader->setInt("gColor", 1);
+    postShader->setMat4("projection", gui->getProjection());
+    postShader->setInt("screenWidth", Window::getInstance()->getWidth());
+    postShader->setInt("screenHeight", Window::getInstance()->getHeight());
 }

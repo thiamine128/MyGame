@@ -14,6 +14,7 @@ public:
     void processInput();
     void onMouseButtonPress(int, double, double) const;
     void onScroll(double, double) const;
+    void onCursorMove(double, double);
     double getMouseX() const;
     double getMouseY() const;
 protected:

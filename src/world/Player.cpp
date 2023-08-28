@@ -22,6 +22,7 @@ Player::Player(World* world) : Entity(world, glm::vec3(0.0), AABB({0, 0, 0}, {0.
     this->immuneTicks = 0;
     this->atk = 1.0;
     this->range = 1.0f;
+    this->tripleShot = false;
 }
 
 Player::~Player()
@@ -39,10 +40,25 @@ void Player::shoot(int dir)
     };
     if (this->shotCooldown <= 0)
     {
-        auto bullet = new Bullet(this->world, this->pos + glm::vec3(0.0, 0.7, 0.0), this->velocity * 0.2f + 4.0f * v0[dir], 0.3f);
-        Bullet::apply(bullet, this, this->items);
-        this->world->getRoom()->addEntity(bullet);
-        this->shotCooldown = this->shootSpeed;
+        if (this->tripleShot)
+        {
+            for (int i = -1; i <= 1; ++i)
+            {
+                int d = dir + i;
+                if (d < 0) d += 4;
+                if (d >= 4) d -= 4;
+                auto bullet = new Bullet(this->world, this->pos + glm::vec3(0.0, 0.7, 0.0), this->velocity * 0.2f + 4.0f * glm::normalize(v0[dir] + 0.5f * v0[d]), 0.3f);
+                Bullet::apply(bullet, this, this->items);
+                this->world->getRoom()->addEntity(bullet);
+                this->shotCooldown = this->shootSpeed;
+            }
+        } else
+        {
+            auto bullet = new Bullet(this->world, this->pos + glm::vec3(0.0, 0.7, 0.0), this->velocity * 0.2f + 4.0f * v0[dir], 0.3f);
+            Bullet::apply(bullet, this, this->items);
+            this->world->getRoom()->addEntity(bullet);
+            this->shotCooldown = this->shootSpeed;
+        }
     }
     this->rotation = glm::radians(90.0f * dir);
 }
@@ -98,6 +114,11 @@ float Player::getRange() const
     return this->range;
 }
 
+void Player::setTripleShot()
+{
+    this->tripleShot = true;
+}
+
 void Player::addAtk(double v)
 {
     this->atk += v;
@@ -119,5 +140,13 @@ void Player::hurt(double d)
     {
         this->health -= d;
         this->immuneTicks = 40;
+    }
+}
+
+void Player::heal()
+{
+    if (this->getHealth() + 1 <= this->getHearts())
+    {
+        this->health += 0.5;
     }
 }

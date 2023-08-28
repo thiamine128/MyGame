@@ -8,14 +8,15 @@
 
 FailedScreen::FailedScreen(GuiRenderer* guiRenderer) : Screen(guiRenderer)
 {
+    this->renderPrev = true;
+    this->screenType = 2;
 }
 
 void FailedScreen::render() const
 {
     glDisable(GL_DEPTH_TEST);
     int w = Window::getInstance()->getWidth(), h = Window::getInstance()->getHeight();
-    this->guiRenderer->renderRect(0, 0, w, h, glm::vec4(0.5f, 0.8f, 0.0f, 1.0f));
-
+    guiRenderer->renderRect(0, 0, w, h, glm::vec4(0.2));
     this->guiRenderer->renderTextCentered(w / 2, h / 2, 2.0, "You Failed");
     this->guiRenderer->renderTextCentered(w / 2, h / 4, 1.0, "Press Space to Restart");
     glEnable(GL_DEPTH_TEST);

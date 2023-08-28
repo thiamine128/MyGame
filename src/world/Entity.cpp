@@ -18,6 +18,7 @@ Entity::Entity(World* world, glm::vec3 const& pos, AABB const& aabb) : world(wor
     this->freezingTick = 0;
     this->scale = glm::vec3(1.0);
     this->hurtTick = 0;
+    this->smooth = true;
 }
 
 
@@ -118,7 +119,21 @@ void Entity::tick()
     }
     else
     {
-        this->onCollide();
+        int side = 0;
+        nextPos = this->pos + this->velocity * glm::vec3(1.0, 0.0, 0.0) * 0.05f;
+        if (this->world->getRoom()->checkCollision(this->getAABB(nextPos)))
+            side |= 1;
+        if (side != 1 && smooth)
+            this->pos = nextPos;
+        else
+        {
+            nextPos = this->pos + this->velocity * glm::vec3(0.0, 0.0, 1.0) * 0.05f;
+            if (this->world->getRoom()->checkCollision(this->getAABB(nextPos)))
+                side |= 2;
+            if (side != 3 && smooth)
+                this->pos = nextPos;
+        }
+        this->onCollide(side);
     }
 
     if (this->health <= 0)
@@ -128,11 +143,16 @@ void Entity::tick()
     }
 }
 
-void Entity::onCollide()
+void Entity::onCollide(int)
 {
 }
 
 bool Entity::isEnemy()
+{
+    return false;
+}
+
+bool Entity::isItem() const
 {
     return false;
 }
@@ -171,10 +191,14 @@ World *Entity::getWorld()
 ItemEntity::ItemEntity(World* world, glm::vec3 const& pos, int item) : Entity(world, pos, {{0, 0, 0}, {1, 1, 1}}), item(item)
 {
     this->model = ModelManager::getModel(Item::m[item]->getModelPath());
+    this->animateTick = 0;
 }
 
 void ItemEntity::tick()
 {
+    this->animateTick++;
+    this->prevPos = this->pos;
+    this->pos.y = 0.2f + glm::sin(this->animateTick * 0.2) * 0.05;
     if (this->world->getPlayer()->getAABB().collideWith(this->getAABB()))
     {
         this->world->getPlayer()->gainItem(Item::m[item]);
@@ -182,9 +206,26 @@ void ItemEntity::tick()
     }
 }
 
-bool ItemEntity::isEnemy()
+bool ItemEntity::isItem() const
 {
-    return false;
+    return true;
+}
+
+void ItemEntity::render(const Shader* shader) const
+{
+    Entity::render(shader);
+
+    glm::mat4 model = glm::mat4(1.0f);
+    auto cur = this->getPosFrame();
+    model = glm::translate(model, glm::vec3(cur.x, 0.0, cur.z));
+    shader->setMat4("model", model);
+
+    ModelManager::getModel("assets/models/itembase.obj")->render(shader);
+}
+
+Item* ItemEntity::getItem() const
+{
+    return Item::m[item];
 }
 
 EntranceEntity::EntranceEntity(World* world, glm::vec3 const& pos) : Entity(world, pos, {{0, 0, 0}, {1, 1, 1}})
@@ -202,6 +243,30 @@ void EntranceEntity::tick()
 }
 
 bool EntranceEntity::isEnemy()
+{
+    return false;
+}
+
+HeartEntity::HeartEntity(World* world, glm::vec3 const& pos) : Entity(world, pos, {{0, 0, 0}, {1, 1, 1}})
+{
+    this->model = ModelManager::getModel("assets/models/heart.obj");
+}
+
+void HeartEntity::tick()
+{
+    Entity::tick();
+    Player* player = world->getPlayer();
+    if (player->getAABB().collideWith(this->getAABB()))
+    {
+        if (player->getHealth() < player->getHearts())
+        {
+            this->remove();
+            player->heal();
+        }
+    }
+}
+
+bool HeartEntity::isEnemy()
 {
     return false;
 }

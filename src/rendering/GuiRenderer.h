@@ -9,6 +9,7 @@ class Model;
 #include <unordered_map>
 #include <string>
 
+class WorldRenderer;
 struct Character
 {
     Texture* texture;
@@ -24,10 +25,14 @@ public:
     
     void renderImage(int, int, int, int, const Texture*);
     void renderRect(int, int, int, int, glm::vec4 const&);
+    void renderPost(WorldRenderer*);
     void renderGuiModel(int, int, int, const Model*, glm::mat4 const&);
     void updateViewport();
+    void renderText(float, float, float, std::string const&, glm::vec4 const&);
     void renderText(float, float, float, std::string const&);
+    void renderTextMultiLined(float, float, float, std::string const&);
     void renderTextCentered(float, float, float, std::string const&);
+    
     glm::vec2 const& getViewport() const;
     glm::mat4 const& getProjection() const;
 protected:

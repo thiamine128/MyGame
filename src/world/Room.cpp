@@ -16,7 +16,7 @@
 int Room::dx[4] = {-1, 0, 0, 1};
 int Room::dy[4] = {0, -1, 1, 0};
 
-Room::Room(World* world, std::string const& layout, int stage) : world(world)
+Room::Room(World* world, std::string const& layout, int stage, int roomFlag) : world(world), rng(rd()), heartDrop(0, 100), roomFlag(roomFlag)
 {
     this->aabbs.push_back({{-9.0f, 0.0f, -9.0f}, {9.0f, 0.0f, 9.0f}});
 
@@ -38,7 +38,7 @@ Room::~Room()
 void Room::render(const Shader* shader)
 {
     glm::mat4 modelMatrix = glm::mat4(1.0f);
-    modelMatrix = glm::scale(modelMatrix, glm::vec3(32.0f));
+    modelMatrix = glm::scale(modelMatrix, glm::vec3(64.0f));
     shader->setMat4("model", modelMatrix);
     this->blockModels[0]->render(shader);
 
@@ -290,6 +290,12 @@ void Room::spawnEntity(int id, int ex, int x, int y)
     case 4:
         this->addEntity(new ZombieShooter(this->world, glm::vec3(x, 0.0, y), ex));
         break;
+    case 5:
+        this->addEntity(new HeartEntity(this->world, glm::vec3(x, 0.0, y)));
+        break;
+    case 6:
+        this->addEntity(new BabyPlum(this->world, glm::vec3(x, 0.0, y)));
+        break;
     default:
         break;
     }
@@ -309,9 +315,35 @@ void Room::onComplete()
                     this->setBlock(7 * dx[dir], i, 0);
         }
     }
+
+    if (heartDrop(rng) < 40)
+        this->spawnEntity(5, 0, 0, 0);
 }
 
 void Room::addParticle(glm::vec3 const& pos, glm::vec3 const& velocity, glm::vec3 const& color)
 {
     this->particles.emplace_back(new Particle(pos, velocity, color));
+}
+
+bool Room::isBossRoom() const
+{
+    return (this->roomFlag) & 1;
+}
+
+Item *Room::getNearestItem() const
+{
+    Item* ret = nullptr;
+    float dist = 100.0f;
+    for (auto i : entities)
+    {
+        if (i->isItem())
+        {
+            if (glm::length(i->getPos() - world->getPlayer()->getPos()) < dist)
+            {
+                dist = glm::length(i->getPos() - world->getPlayer()->getPos());
+                ret = ((ItemEntity*) i)->getItem();
+            }
+        }
+    }
+    return ret;
 }

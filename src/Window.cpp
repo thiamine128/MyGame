@@ -39,6 +39,7 @@ void Window::init(int width, int height, const char* title)
     glfwSetKeyCallback(this->window, keyCallback);
     glfwSetMouseButtonCallback(this->window, mouseButtonCallback);
     glfwSetScrollCallback(this->window, scrollCallback);
+    glfwSetCursorPosCallback(this->window, cursorPosCallback);
 }
 
 Window::~Window()
@@ -111,6 +112,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
     Game::getInstance()->getWorldRenderer()->updateProjection();
     Game::getInstance()->getGui()->updateViewport();
     ShaderManager::initUniforms(Game::getInstance()->getWorldRenderer(), Game::getInstance()->getGui());
+    Game::getInstance()->getScreenManager()->handleResize(width, height);
 }
 
 void keyCallback(GLFWwindow* window, int key, int code, int action, int mods)
@@ -134,4 +136,9 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset)
 {
     Game::getInstance()->getController()->onScroll(xOffset, yOffset);
+}
+
+void cursorPosCallback(GLFWwindow* window, double x, double y)
+{
+    Game::getInstance()->getController()->onCursorMove(x, y);
 }

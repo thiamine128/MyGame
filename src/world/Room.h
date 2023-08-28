@@ -4,6 +4,7 @@
 #include "world/Entity.h"
 
 #include <vector>
+#include <random>
 #include "particle/Particle.h"
 
 class World;
@@ -11,7 +12,7 @@ class World;
 class Room
 {
 public:
-    Room(World*, std::string const&, int);
+    Room(World*, std::string const&, int, int);
     ~Room();
 
     void render(const Shader*);
@@ -30,6 +31,8 @@ public:
     void spawnEntity(int, int, int, int);
     void onComplete();
     void addParticle(glm::vec3 const&, glm::vec3 const&, glm::vec3 const&);
+    bool isBossRoom() const;
+    Item* getNearestItem() const;
 protected:
     int block[15][15];
     World* world;
@@ -39,6 +42,11 @@ protected:
     std::vector<AABB> aabbs;
     std::vector<Entity*> entities;
     std::vector<Particle*> particles;
+    std::random_device rd;
+    std::mt19937 rng;
+    std::uniform_int_distribution<int> heartDrop;
+    int roomFlag;
+
     int completeFlag;
 
     static int dx[4];

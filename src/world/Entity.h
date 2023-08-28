@@ -24,8 +24,9 @@ public:
     bool shouldRemove() const;
     virtual void render(const Shader*) const;
     virtual void tick();
-    virtual void onCollide();
+    virtual void onCollide(int);
     virtual bool isEnemy();
+    virtual bool isItem() const;
     virtual void onDeath();
     virtual void onRemove();
     void freeze(int);
@@ -49,6 +50,7 @@ protected:
     std::random_device rd;
     std::mt19937 rng;
     int hurtTick;
+    bool smooth;
 };
 
 class ItemEntity : public Entity
@@ -57,15 +59,27 @@ public:
     ItemEntity(World*, glm::vec3 const&, int);
 
     virtual void tick();
-    virtual bool isEnemy();
+    virtual bool isItem() const;
+    virtual void render(const Shader*) const;
+    Item* getItem() const;
 protected:
     int item;
+    int animateTick;
 };
 
 class EntranceEntity : public Entity
 {
 public:
     EntranceEntity(World*, glm::vec3 const&);
+
+    virtual void tick();
+    virtual bool isEnemy();
+};
+
+class HeartEntity : public Entity
+{
+public:
+    HeartEntity(World*, glm::vec3 const&);
 
     virtual void tick();
     virtual bool isEnemy();
