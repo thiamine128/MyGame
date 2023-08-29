@@ -28,11 +28,14 @@ public:
     void setConnect(int, Room*);
     void getEnemiesWithin(std::vector<Entity*>&, AABB const&);
     void loadLayout(std::string const&);
-    void spawnEntity(int, int, int, int);
+    void spawnEntity(int, int, float, float);
     void onComplete();
     void addParticle(glm::vec3 const&, glm::vec3 const&, glm::vec3 const&);
+    void addParticle(glm::vec3 const&, glm::vec3 const&, glm::vec3 const&, int);
     bool isBossRoom() const;
     Item* getNearestItem() const;
+    Entity* findNearestEnemy() const;
+    glm::ivec2 findSpace(int, int);
 protected:
     int block[15][15];
     World* world;

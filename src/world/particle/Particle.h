@@ -5,7 +5,7 @@
 class Particle
 {
 public:
-    Particle(glm::vec3 const&, glm::vec3 const&, glm::vec3 const&);
+    Particle(glm::vec3 const&, glm::vec3 const&, glm::vec3 const&, int);
 
     void tick();
     bool alive();

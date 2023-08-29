@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "ModelManager.h"
 #include "Bullet.h"
+#include "SoundManager.h"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -18,6 +19,7 @@ Player::Player(World* world) : Entity(world, glm::vec3(0.0), AABB({0, 0, 0}, {0.
     this->shootSpeed = 10;
     this->shotCooldown = 0;
     this->health = 3.0f;
+    this->hearts = 6;
     this->speed = 3.0f;
     this->immuneTicks = 0;
     this->atk = 1.0;
@@ -59,6 +61,7 @@ void Player::shoot(int dir)
             this->world->getRoom()->addEntity(bullet);
             this->shotCooldown = this->shootSpeed;
         }
+        SoundManager::play("assets/sounds/shoot.wav");
     }
     this->rotation = glm::radians(90.0f * dir);
 }
@@ -96,7 +99,7 @@ void Player::gainItem(Item* item)
 
 int Player::getHearts()
 {
-    return 6;
+    return hearts;
 }
 
 int Player::getHealth()
@@ -134,6 +137,11 @@ void Player::addShootSpeed(int ticks)
     this->shootSpeed -= ticks;
 }
 
+void Player::addSpeed(float v)
+{
+    this->speed += v;
+}
+
 void Player::hurt(double d)
 {
     if (this->immuneTicks <= 0)
@@ -149,4 +157,10 @@ void Player::heal()
     {
         this->health += 0.5;
     }
+}
+
+void Player::addHeart(int v)
+{
+    hearts += v;
+    health += 2 * v;
 }

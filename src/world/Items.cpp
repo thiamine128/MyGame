@@ -10,6 +10,9 @@ Item* Item::milk = nullptr;
 Item* Item::glass = nullptr;
 Item* Item::magician = nullptr;
 Item* Item::branch = nullptr;
+Item* Item::shoes = nullptr;
+Item* Item::kettle = nullptr;
+Item* Item::fertilizer = nullptr;
 
 Item::Item(std::string const& name, std::string const& modelPath, std::vector<std::string> const& description) : name(name), modelPath(modelPath), description(description)
 {
@@ -48,6 +51,15 @@ void Item::onPickup(Item* item, Player* player)
     } else if (item == branch)
     {
         player->setTripleShot();
+    } else if (item == shoes)
+    {
+        player->addSpeed(1.0f);
+    } else if (item == kettle)
+    {
+        player->addHeart(4);
+    } else if (item == fertilizer)
+    {
+        player->addAtk(1);
     }
 }
 
@@ -58,6 +70,9 @@ void Item::init()
     m[3] = arrow = new Item("Arrow", "assets/models/peaarrow.obj", {"Piercing pea"});
     m[4] = milk = new Item("Milk", "assets/models/milk.obj", {"Shoot speed up"});
     m[5] = glass = new Item("Glass", "assets/models/glass.obj", {"Range up"});
-    m[6] = magician = new Item("Magician", "assets/models/magician.obj", {"TODO"});
+    m[6] = magician = new Item("Magician", "assets/models/magician.obj", {"Tracking shot"});
     m[7] = branch = new Item("Branch", "assets/models/branch.obj", {"Triple shot"});
+    m[8] = shoes = new Item("Shoes", "assets/models/shoes.obj", {"Speed up"});
+    m[9] = kettle = new Item("Kettle", "assets/models/kettle.obj", {"Health up"});
+    m[10] = fertilizer = new Item("Fertilizer", "assets/models/fertilizer.obj", {"Pea size up", "Damage up"});
 }

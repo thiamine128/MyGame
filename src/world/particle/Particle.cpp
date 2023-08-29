@@ -2,9 +2,9 @@
 
 #include "Game.h"
 
-Particle::Particle(glm::vec3 const& pos, glm::vec3 const& velocity, glm::vec3 const& color) : pos(pos), velocity(velocity)
+Particle::Particle(glm::vec3 const& pos, glm::vec3 const& velocity, glm::vec3 const& color, int life) : pos(pos), velocity(velocity)
 {
-    this->life = this->maxLife = 12;
+    this->life = this->maxLife = life;
     this->prevPos = pos;
     this->scale = this->prevScale = 1.0f;
     this->color = glm::vec4(color, 1.0);

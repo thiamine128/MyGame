@@ -3,6 +3,7 @@
 #include "TextureManager.h"
 #include "ModelManager.h"
 #include "ShaderManager.h"
+#include "SoundManager.h"
 #include "Window.h"
 #include "world/World.h"
 #include "world/Items.h"
@@ -31,8 +32,8 @@ void Game::initRendering()
 }
 
 Game::~Game() {
+    quitGame();
     delete this->renderer;
-    delete this->world;
     delete this->controller;
 }
 
@@ -48,21 +49,23 @@ void Game::init() {
     ImGui_ImplOpenGL3_Init("#version 330");
 
 
-    this->initRendering();
+    initRendering();
     Item::init();
     
-    this->renderer = new WorldRenderer();
+    renderer = new WorldRenderer();
     
-    this->controller = new Controller();
-    this->currentFrame = this->lastFrame = this->deltaTime = 0.0f;
-    this->gui = new GuiRenderer();
-    this->screenManager = new ScreenManager(this->gui);
+    controller = new Controller();
+    currentFrame = this->lastFrame = this->deltaTime = 0.0f;
+    gui = new GuiRenderer();
+    screenManager = new ScreenManager(this->gui);
 
     ShaderManager::initUniforms(this->renderer, this->gui);
     
-    this->world = nullptr;
-    this->screenManager->pushMenuScreen();
-    this->paused = false;
+    world = nullptr;
+    screenManager->pushMenuScreen();
+    paused = false;
+
+    SoundManager::init();
 }
 
 void Game::run() {
@@ -157,6 +160,7 @@ float Game::getFrameTime() const
 
 void Game::newGame()
 {
+    this->paused = false;
     if (this->world != nullptr)
     {
         delete this->world;
@@ -183,6 +187,14 @@ void Game::continueGame()
     this->screenManager->popScreen();
 }
 
+void Game::quitGame()
+{
+    if (this->world != nullptr)
+    {
+        delete this->world;
+    }
+}
+
 Game* Game::getInstance() {
     if (instance == nullptr) {
         instance = new Game();
@@ -199,5 +211,6 @@ void Game::terminate()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+    SoundManager::terminate();
     delete instance;
 }

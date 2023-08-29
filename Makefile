@@ -52,7 +52,7 @@ endif
 INCLUDES	:= $(patsubst %,-I%, $(INCLUDEDIRS:%/=%))
 
 # define the C libs
-LIBS		:= $(patsubst %,-L%, $(LIBDIRS:%/=%)) -lglad -lglfw3dll -lassimp.dll -lfreetype
+LIBS		:= $(patsubst %,-L%, $(LIBDIRS:%/=%)) -lglad -lglfw3dll -lassimp.dll -lfreetype -lfmod
 
 rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
 

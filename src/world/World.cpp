@@ -54,7 +54,7 @@ void World::nextStage()
     this->stage++;
     LayerGenerator::clear();
     this->prepareNext = false;
-    this->room = LayerGenerator::generateRooms(this, 6, this->stage);
+    this->room = LayerGenerator::generateRooms(this, 10, this->stage);
     for (int i = 0; i < 13; ++i)
     {
         for (int j = 0; j < 13; ++j)

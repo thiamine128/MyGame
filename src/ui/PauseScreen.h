@@ -9,4 +9,5 @@ public:
 
     virtual void render() const;
     virtual void handleKeyPress(int);
+    virtual void handleResize(int, int);
 };

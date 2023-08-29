@@ -11,7 +11,7 @@ def findCpps(path):
     lis = []
     for root, dir, files in os.walk(path):
         for file in files:
-            if file.endswith(".cpp") and not "imgui" in file:
+            if file.endswith(".cpp") and not "imgui" in file and (not "rendering" in root):
                 lis.append(root + "\\" + file)
     return lis
 

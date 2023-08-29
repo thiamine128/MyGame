@@ -83,7 +83,7 @@ Zombie::Zombie(World* world, glm::vec3 const& pos, int type) : Enemy(world, pos)
 SlimeBoss::SlimeBoss(World* world, glm::vec3 const& pos) : Enemy(world, pos), uni(0.0, 1.0)
 {
     this->model = ModelManager::getModel("assets/models/slimeboss.obj");
-    this->health = 40.0f;
+    this->health = 120.0f;
     this->aabb = {{0, 0, 0}, {4, 4, 4}};
     this->scale = glm::vec3(6.0);
 }
@@ -188,7 +188,7 @@ void ZombieShooter::tick()
                 this->world->getRoom()->addEntity(enemyBullet);
             } else
             {
-                auto enemyBullet = new EnemyBullet(this->world, this->pos + glm::vec3(0.0, 1.0, 0.0), glm::normalize(ppos - pos) * 4.0f, 0.4f, 4.0f, glm::vec4(1.0, 0.8, 0.0, 1.0));
+                auto enemyBullet = new EnemyBullet(this->world, this->pos + glm::vec3(0.0, 1.0, 0.0), glm::normalize(ppos - pos) * 2.5f, 0.4f, 4.0f, glm::vec4(1.0, 0.8, 0.0, 1.0));
                 this->world->getRoom()->addEntity(enemyBullet);
             }
         }
@@ -203,6 +203,7 @@ BabyPlum::BabyPlum(World* world, glm::vec3 const& pos) : Enemy(world, pos), acti
     this->action = 0;
     this->actionTick = 30;
     this->smooth = false;
+    this->health = 240.0;
 }
 
 void BabyPlum::tick()
@@ -222,7 +223,7 @@ void BabyPlum::tick()
             break;
         case 2:
             this->actionTick = 240;
-            this->velocity = glm::normalize(player->getPos() - pos) * 3.0f;
+            this->velocity = glm::normalize(player->getPos() - pos) * 5.0f;
             this->velocity.y = 0.0f;
             break;
         default:
@@ -267,6 +268,7 @@ void BabyPlum::updateAi()
 
 void BabyPlum::onDeath()
 {
+    this->world->getRoom()->spawnEntity(3, 0, 0, 0);
 }
 
 void BabyPlum::onCollide(int side)

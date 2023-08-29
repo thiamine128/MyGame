@@ -27,6 +27,7 @@ public:
     void startNewGame();
     void pause();
     void continueGame();
+    void quitGame();
 
     static Game* getInstance();
     static void terminate();

@@ -23,14 +23,17 @@ public:
     void addAtk(double);
     void addRange(float);
     void addShootSpeed(int);
+    void addSpeed(float);
     void hurt(double);
     void heal();
+    void addHeart(int);
 protected:
     int shotCooldown;
     int immuneTicks;
     int shootSpeed;
     bool tripleShot;
     double atk;
+    int hearts;
     float range;
     std::vector<Item*> items;
 };

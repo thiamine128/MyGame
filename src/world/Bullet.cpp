@@ -14,6 +14,7 @@ Bullet::Bullet(World* world, glm::vec3 const& pos, glm::vec3 const& velocity, fl
     this->range = 1.0f;
     this->color = glm::vec4(0.64, 1.0, 0.15, 1.0);
     this->initialPos = pos;
+    this->totDist = 0;
 }
 
 void Bullet::render(const Shader* shader) const
@@ -44,16 +45,25 @@ void Bullet::render(const Shader* shader) const
 
 void Bullet::tick()
 {
-    if (glm::length(initialPos - pos) > range)
+    float horizontalV = glm::length(glm::vec3(velocity.x, 0, velocity.z));
+    if (totDist > range || horizontalV < 0.3f)
     {
         this->velocity.y -= 0.15;
     }
     if (this->isTracking())
     {
-        // TODO: tracking
+        Entity* ent = world->getRoom()->findNearestEnemy();
+        if (ent != nullptr)
+        {
+            auto v = glm::normalize(ent->getPos() - pos);
+            this->velocity.x = v.x * horizontalV;
+            this->velocity.z = v.z * horizontalV;
+        }
+
+        world->getRoom()->addParticle(pos + glm::vec3(uni(rng), uni(rng), uni(rng)) * size * 0.5f, glm::vec3(0.0), glm::vec3(0.6, 0.0, 0.8), 8);
     }
     Entity::tick();
-
+    this->totDist += horizontalV * 0.05;
     Entity* hit = this->world->getRoom()->hitEnermy(this->getAABB());
     if (hit != nullptr)
     {
@@ -186,6 +196,9 @@ void Bullet::apply(Bullet* bullet, Player* player, std::vector<Item*> const& ite
         } else if (item == Item::magician)
         {
             bullet->setTracking();
+        } else if (item == Item::fertilizer)
+        {
+            bullet->size += 0.3;
         }
     }
 

@@ -35,6 +35,7 @@ protected:
     float range;
     float size;
     float damage;
+    float totDist;
     const Model* model;
     const Model* fire;
     glm::vec3 initialPos;

@@ -3,6 +3,7 @@
 #include "Window.h"
 #include "Game.h"
 #include "rendering/WorldRenderer.h"
+#include "SoundManager.h"
 #include <GLFW/glfw3.h>
 
 #include <iostream>
@@ -42,6 +43,7 @@ void Controller::onPress(int key) const
         Game::getInstance()->getScreenManager()->escape();
     }
     Game::getInstance()->getScreenManager()->handleKeyPress(key);
+    SoundManager::play("assets/sounds/splat.mp3");
 }
 
 void Controller::processInput()

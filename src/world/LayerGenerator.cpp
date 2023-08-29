@@ -12,8 +12,11 @@ Room *LayerGenerator::generateRooms(World* world, int num, int stage)
 {
     std::random_device rd;
     std::mt19937 rng(rd());
-    int roomCnt = 3;
+    int roomCnt = 4;
     if (stage == 2)
+    {
+        roomCnt = 2;
+    } else if (stage == 3)
     {
         roomCnt = 2;
     }
@@ -22,7 +25,7 @@ Room *LayerGenerator::generateRooms(World* world, int num, int stage)
     std::priority_queue<std::tuple<int, int, int>> pq;
     pq.emplace(uni(rng), 6, 6);
     int cnt = 1;
-
+    
     while (cnt < num && !pq.empty())
     {
         auto c = pq.top();

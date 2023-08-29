@@ -25,6 +25,9 @@ public:
     static Item* glass;
     static Item* magician;
     static Item* branch;
+    static Item* shoes;
+    static Item* kettle;
+    static Item* fertilizer;
 protected:
     std::string name;
     std::string modelPath;

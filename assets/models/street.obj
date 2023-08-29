@@ -1,0 +1,15 @@
+# Made in Blockbench 4.8.2
+mtllib street.mtl
+
+o plane
+v 0.5 0 0.5
+v 0.5 0 -0.5
+v -0.5 0 0.5
+v -0.5 0 -0.5
+vt 1 0
+vt 1 1
+vt 0 1
+vt 0 0
+vn 0 1 0
+usemtl m_62fc9eae-2e79-cbbc-0c66-613296074d24
+f 1/1/1 2/2/1 4/3/1 3/4/1

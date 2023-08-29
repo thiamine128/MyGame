@@ -209,6 +209,11 @@ void Room::setupModels(int stage)
         this->blockModels[2] = ModelManager::getModel("assets/models/rock.obj");
         this->blockModels[3] = ModelManager::getModel("assets/models/mushroom.obj");
         break;
+    case 3:
+        this->blockModels[0] = ModelManager::getModel("assets/models/street.obj");
+        this->blockModels[1] = ModelManager::getModel("assets/models/cone.obj");
+        this->blockModels[2] = ModelManager::getModel("assets/models/rock.obj");
+        this->blockModels[3] = ModelManager::getModel("assets/models/mushroom.obj");
     default:
         break;
     }
@@ -244,6 +249,7 @@ void Room::getEnemiesWithin(std::vector<Entity*>& entities, AABB const& aabb)
 void Room::loadLayout(std::string const& layout)
 {
     std::ifstream f;
+    std::cout << layout << std::endl;
     f.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     f.open(layout);
 
@@ -262,7 +268,8 @@ void Room::loadLayout(std::string const& layout)
         }
     }
 
-    int t, d, x, y;
+    int t, d;
+    float x, y;
     char s;
     while (fs >> t)
     {
@@ -271,7 +278,7 @@ void Room::loadLayout(std::string const& layout)
     }
 }
 
-void Room::spawnEntity(int id, int ex, int x, int y)
+void Room::spawnEntity(int id, int ex, float x, float y)
 {
     switch (id)
     {
@@ -317,17 +324,28 @@ void Room::onComplete()
     }
 
     if (heartDrop(rng) < 40)
-        this->spawnEntity(5, 0, 0, 0);
+    {
+        Player* player = world->getPlayer();
+        auto pos = findSpace(floor(player->getPos().x), floor(player->getPos().y));
+        this->spawnEntity(5, 0, pos.x, pos.y);
+
+    }
 }
 
 void Room::addParticle(glm::vec3 const& pos, glm::vec3 const& velocity, glm::vec3 const& color)
 {
-    this->particles.emplace_back(new Particle(pos, velocity, color));
+    addParticle(pos, velocity, color, 12);
+}
+
+void Room::addParticle(glm::vec3 const& pos, glm::vec3 const& velocity, glm::vec3 const& color, int life)
+{
+    particles.emplace_back(new Particle(pos, velocity, color, life));
+
 }
 
 bool Room::isBossRoom() const
 {
-    return (this->roomFlag) & 1;
+    return roomFlag & 1;
 }
 
 Item *Room::getNearestItem() const
@@ -342,6 +360,44 @@ Item *Room::getNearestItem() const
             {
                 dist = glm::length(i->getPos() - world->getPlayer()->getPos());
                 ret = ((ItemEntity*) i)->getItem();
+            }
+        }
+    }
+    return ret;
+}
+
+Entity *Room::findNearestEnemy() const
+{
+    double dist = 400.0f;
+    Entity* ret = nullptr;
+    for (auto e : entities)
+    {
+        if (e->isEnemy() && glm::length(e->getPos() - world->getPlayer()->getPos()) < dist)
+        {
+            dist = glm::length(e->getPos() - world->getPlayer()->getPos());
+            ret = e;
+        }
+    }
+    return ret;
+}
+
+glm::ivec2 Room::findSpace(int x, int y)
+{
+    int dist = 400;
+    glm::ivec2 ret = glm::ivec2(0);
+    for (int i = -7; i <= 7; ++i)
+    {
+        for (int j = -7; j <= 7; ++j)
+        {
+            if (getBlock(i, j) == 0)
+            {
+                int dx = i - x, dy = j - y;
+                int d = dx * dx + dy * dy;
+                if (d >= 5 && d < dist)
+                {
+                    dist = d;
+                    ret = glm::ivec2(i, j);
+                }
             }
         }
     }
