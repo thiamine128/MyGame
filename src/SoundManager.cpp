@@ -47,3 +47,8 @@ void SoundManager::play(std::string const& s)
 
     FMOD_System_PlaySound(system, sound, 0, false, &channel);
 }
+
+void SoundManager::update()
+{
+    FMOD_System_Update(system);
+}

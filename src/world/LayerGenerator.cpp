@@ -36,7 +36,11 @@ Room *LayerGenerator::generateRooms(World* world, int num, int stage)
         if (cnt + 1 == num)
         {
             layoutId = "boss", flag |= 1;
-        } else if (cnt > 1)
+        } else if (cnt + 2 == num)
+        {
+            layoutId = "item", flag |= 2;
+        }
+        else if (cnt > 1)
             layoutId = std::to_string(layout(rng));
         
         m[x][y] = new Room(world, "assets/rooms/" + std::to_string(stage) + "/" + layoutId + ".layout", stage, flag);

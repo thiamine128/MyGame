@@ -99,7 +99,7 @@ void Player::gainItem(Item* item)
 
 int Player::getHearts()
 {
-    return hearts;
+     return hearts;
 }
 
 int Player::getHealth()
@@ -162,5 +162,5 @@ void Player::heal()
 void Player::addHeart(int v)
 {
     hearts += v;
-    health += 2 * v;
+    health += 0.5 * v;
 }

@@ -1,8 +1,10 @@
 #include "Items.h"
 
+#include "World.h"
 #include "Player.h"
 
 Item* Item::m[128];
+int Item::itemNum = 10;
 Item* Item::torchwood = nullptr;
 Item* Item::ice = nullptr;
 Item* Item::arrow = nullptr;
@@ -61,6 +63,8 @@ void Item::onPickup(Item* item, Player* player)
     {
         player->addAtk(1);
     }
+
+    player->getWorld()->addScore(1000);
 }
 
 void Item::init()

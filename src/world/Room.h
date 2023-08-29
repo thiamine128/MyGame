@@ -33,6 +33,7 @@ public:
     void addParticle(glm::vec3 const&, glm::vec3 const&, glm::vec3 const&);
     void addParticle(glm::vec3 const&, glm::vec3 const&, glm::vec3 const&, int);
     bool isBossRoom() const;
+    bool isItemRoom() const;
     Item* getNearestItem() const;
     Entity* findNearestEnemy() const;
     glm::ivec2 findSpace(int, int);
@@ -48,6 +49,7 @@ protected:
     std::random_device rd;
     std::mt19937 rng;
     std::uniform_int_distribution<int> heartDrop;
+    std::uniform_int_distribution<int> itemUni;
     int roomFlag;
 
     int completeFlag;

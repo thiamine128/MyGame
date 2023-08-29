@@ -17,6 +17,7 @@ public:
     static void onPickup(Item*, Player*);
 
     static void init();
+    static int itemNum;
     static Item* m[128];
     static Item* torchwood;
     static Item* ice;

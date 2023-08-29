@@ -10,6 +10,7 @@ public:
     static void init();
     static void terminate();
     static void play(std::string const&);
+    static void update();
 protected:
     static FMOD_SYSTEM* system;
     static FMOD_CHANNEL* channel;

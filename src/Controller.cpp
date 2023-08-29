@@ -43,7 +43,6 @@ void Controller::onPress(int key) const
         Game::getInstance()->getScreenManager()->escape();
     }
     Game::getInstance()->getScreenManager()->handleKeyPress(key);
-    SoundManager::play("assets/sounds/splat.mp3");
 }
 
 void Controller::processInput()

@@ -4,6 +4,7 @@
 #include "FailedScreen.h"
 #include "MenuScreen.h"
 #include "PauseScreen.h"
+#include "WinScreen.h"
 #include "Game.h"
 #include "Window.h"
 
@@ -67,6 +68,11 @@ void ScreenManager::pushMenuScreen()
 void ScreenManager::pushPauseScreen()
 {
     this->screens[++(this->stackTop)] = new PauseScreen(this->guiRenderer);
+}
+
+void ScreenManager::pushWinScreen()
+{
+    this->screens[++(this->stackTop)] = new WinScreen(this->guiRenderer);
 }
 
 void ScreenManager::escape()

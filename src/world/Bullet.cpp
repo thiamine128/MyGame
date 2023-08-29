@@ -1,6 +1,7 @@
 #include "Bullet.h"
 
 #include "ModelManager.h"
+#include "SoundManager.h"
 #include "World.h"
 #include <iostream>
 
@@ -166,11 +167,15 @@ bool Bullet::isTracking() const
 void Bullet::doDamage(Entity* e)
 {
     if (!this->isPierce())
+    {
         e->hurt(this->damage);
+        SoundManager::play("assets/sounds/hit.mp3");
+    }
     else
     {
         if (pierced.count(e) == 0)
         {
+            SoundManager::play("assets/sounds/hit.mp3");
             e->hurt(this->damage);
             pierced.insert(e);
         }

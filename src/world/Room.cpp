@@ -22,6 +22,9 @@ Room::Room(World* world, std::string const& layout, int stage, int roomFlag) : w
 
     this->setupModels(stage);
 
+    itemUni = std::uniform_int_distribution<int>(1, Item::itemNum);
+
+
     for (int i = 0; i < 4; ++i)
         next[i] = nullptr, door[i] = 0;
     
@@ -249,7 +252,6 @@ void Room::getEnemiesWithin(std::vector<Entity*>& entities, AABB const& aabb)
 void Room::loadLayout(std::string const& layout)
 {
     std::ifstream f;
-    std::cout << layout << std::endl;
     f.exceptions(std::ifstream::failbit | std::ifstream::badbit);
     f.open(layout);
 
@@ -283,6 +285,10 @@ void Room::spawnEntity(int id, int ex, float x, float y)
     switch (id)
     {
     case 0:
+        if (ex == 0)
+        {
+            ex = itemUni(rng);
+        }
         this->addEntity(new ItemEntity(this->world, glm::vec3(x, 0.0, y), ex));
         break;
     case 1:
@@ -303,6 +309,9 @@ void Room::spawnEntity(int id, int ex, float x, float y)
     case 6:
         this->addEntity(new BabyPlum(this->world, glm::vec3(x, 0.0, y)));
         break;
+    case 7:
+        this->addEntity(new Dragon(this->world, glm::vec3(x, 0.0, y)));
+        break;
     default:
         break;
     }
@@ -310,6 +319,7 @@ void Room::spawnEntity(int id, int ex, float x, float y)
 
 void Room::onComplete()
 {
+    world->addScore(1000);
     for (int dir = 0; dir < 4; ++dir)
     {
         if (door[dir])
@@ -323,12 +333,18 @@ void Room::onComplete()
         }
     }
 
-    if (heartDrop(rng) < 40)
+    if (heartDrop(rng) < 60)
     {
         Player* player = world->getPlayer();
         auto pos = findSpace(floor(player->getPos().x), floor(player->getPos().y));
-        this->spawnEntity(5, 0, pos.x, pos.y);
+        this->spawnEntity(5, 0, pos.x + 0.5, pos.y + 0.5);
+    }
 
+    if (heartDrop(rng) < 30)
+    {
+        Player* player = world->getPlayer();
+        auto pos = findSpace(floor(player->getPos().x), floor(player->getPos().y));
+        this->spawnEntity(0, 0, pos.x + 0.5, pos.y + 0.5);
     }
 }
 
@@ -346,6 +362,11 @@ void Room::addParticle(glm::vec3 const& pos, glm::vec3 const& velocity, glm::vec
 bool Room::isBossRoom() const
 {
     return roomFlag & 1;
+}
+
+bool Room::isItemRoom() const
+{
+    return roomFlag & 2;
 }
 
 Item *Room::getNearestItem() const

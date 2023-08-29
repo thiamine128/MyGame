@@ -10,6 +10,8 @@ World::World()
     this->player = new Player(this);
     this->stage = 0;
     this->nextStage();
+    this->score = 10000;
+    this->scoreTick = 20;
 }
 
 World::~World()
@@ -43,6 +45,11 @@ void World::tick()
     this->player->tick();
     this->room->tick();
 
+    if (this->scoreTick == 0)
+        this->score--, this->scoreTick = 20;
+    else
+        this->scoreTick--;
+
     if (this->prepareNext)
     {
         this->nextStage();
@@ -67,4 +74,14 @@ void World::nextStage()
 void World::prepareNextStage()
 {
     this->prepareNext = true;
+}
+
+void World::addScore(int v)
+{
+    this->score += v;
+}
+
+int World::getScore() const
+{
+    return this->score;
 }

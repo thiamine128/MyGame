@@ -37,6 +37,8 @@ void GameScreen::render() const
         else
             this->guiRenderer->renderImage(i * healthSize, height - healthSize, healthSize, healthSize, TextureManager::getTexture("assets/textures/health_empty.png"));
     }
+
+    this->guiRenderer->renderTextCentered(Window::getInstance()->getWidth() / 2, height - 80, 1.0f, "Score: " + std::to_string(worldRenderer->getWorld()->getScore()));
     
     Screen::render();
     renderItemHint();
@@ -84,6 +86,8 @@ void GameScreen::renderMap(int size, float alpha) const
                     color = glm::vec4(0.8, 0.8, 0.8, 1.0);
                 if (room->isBossRoom())
                     color.r = 1.0f;
+                if (room->isItemRoom())
+                    color.r = 1.0, color.g = 1.0;
                 guiRenderer->renderRect(w / 2 - size / 2 + i * roomSize + 5, h / 2 - size / 2 + j * roomSize + 5, w / 2 - size / 2 + (i + 1) * roomSize - 5, h / 2 - size / 2 + (j + 1) * roomSize - 5, color);
             }
         }

@@ -120,6 +120,8 @@ void Game::run() {
         {
             this->screenManager->pushFailedScreen();
         }
+
+        SoundManager::update();
     }
 }
 

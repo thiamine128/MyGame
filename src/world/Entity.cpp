@@ -2,6 +2,7 @@
 
 #include "Game.h"
 #include "ModelManager.h"
+#include "SoundManager.h"
 
 #include <iostream>
 
@@ -159,6 +160,7 @@ bool Entity::isItem() const
 
 void Entity::onDeath()
 {
+    
 }
 
 void Entity::onRemove()

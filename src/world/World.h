@@ -24,10 +24,14 @@ public:
     void tick();
     void nextStage();
     void prepareNextStage();
+    void addScore(int);
+    int getScore() const;
 protected:
     Player* player;
     Room* room;
     Room* grid[13][13];
     int stage;
+    int score;
+    int scoreTick;
     bool prepareNext;
 };
