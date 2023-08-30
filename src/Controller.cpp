@@ -16,6 +16,7 @@ Controller::~Controller()
 {
 }
 
+//根据键盘输入得到玩家的移动方向
 glm::vec3 Controller::getVelocity()
 {
     const float speed = 1.0;
@@ -36,6 +37,7 @@ bool Controller::isKeyPressed(int key) const
     return Window::getInstance()->getKey(key) == GLFW_PRESS;
 }
 
+//将输入事件传递给游戏界面管理器
 void Controller::onPress(int key) const
 {
     if (key == GLFW_KEY_ESCAPE)

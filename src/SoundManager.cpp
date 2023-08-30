@@ -6,6 +6,7 @@ FMOD_SYSTEM* SoundManager::system = nullptr;
 FMOD_CHANNEL* SoundManager::channel = 0;
 std::unordered_map<std::string, FMOD_SOUND*> SoundManager::entires;
 
+//初始化FMOD
 void SoundManager::init()
 {
     FMOD_RESULT result;
@@ -22,12 +23,14 @@ void SoundManager::init()
     }
 }
 
+//释放内存
 void SoundManager::terminate()
 {
     FMOD_System_Close(system);
     FMOD_System_Release(system);
 }
 
+//播放音效
 void SoundManager::play(std::string const& s)
 {
     FMOD_SOUND* sound;
@@ -48,6 +51,7 @@ void SoundManager::play(std::string const& s)
     FMOD_System_PlaySound(system, sound, 0, false, &channel);
 }
 
+//FMOD更新
 void SoundManager::update()
 {
     FMOD_System_Update(system);

@@ -16,6 +16,7 @@ Shader* ShaderManager::textShader = nullptr;
 Shader* ShaderManager::rectShader = nullptr;
 Shader* ShaderManager::postShader = nullptr;
 
+//加载着色器
 void ShaderManager::load()
 {
     defaultShader = new Shader("assets/shader/default.vsh", "assets/shader/default.fsh");
@@ -79,6 +80,7 @@ const Shader *ShaderManager::getPost()
     return postShader;
 }
 
+//更新着色器的uniform变量（频繁修改）
 void ShaderManager::setupUniforms(const WorldRenderer* renderer)
 {
     defaultShader->use();
@@ -94,7 +96,7 @@ void ShaderManager::setupUniforms(const WorldRenderer* renderer)
     shadowShader->use();
     shadowShader->setMat4("lightSpace", renderer->getLightSpace());
 }
-
+//更新着色器的uniform变量（不常修改）
 void ShaderManager::initUniforms(const WorldRenderer* renderer, const GuiRenderer* gui)
 {
     defaultShader->use();

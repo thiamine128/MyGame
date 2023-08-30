@@ -22,6 +22,7 @@ void HelpScreen::render() const
     this->guiRenderer->renderTextCentered(w / 2, h / 6 * 4, 1.5, "Shoot: Arrows");
     this->guiRenderer->renderTextCentered(w / 2, h / 6 * 3, 1.5, "Pause: Esc");
     this->guiRenderer->renderTextCentered(w / 2, h / 6 * 2, 1.5, "Map: M");
+    this->guiRenderer->renderTextCentered(w / 2, h / 6 * 1, 1.5, "Place potato mine: E");
     glEnable(GL_DEPTH_TEST);
 }
 

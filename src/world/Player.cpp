@@ -25,6 +25,7 @@ Player::Player(World* world) : Entity(world, glm::vec3(0.0), AABB({0, 0, 0}, {0.
     this->atk = 1.0;
     this->range = 1.0f;
     this->tripleShot = false;
+    this->potatoes = 2;
 }
 
 Player::~Player()
@@ -117,6 +118,11 @@ float Player::getRange() const
     return this->range;
 }
 
+int Player::getPotatoes() const
+{
+    return this->potatoes;
+}
+
 void Player::setTripleShot()
 {
     this->tripleShot = true;
@@ -163,4 +169,18 @@ void Player::addHeart(int v)
 {
     hearts += v;
     health += 0.5 * v;
+}
+
+void Player::placeMine()
+{
+    if (this->potatoes)
+    {
+        world->getRoom()->spawnEntity(9, 0, pos.x, pos.z);
+        this->potatoes--;
+    }
+}
+
+void Player::gainPotato(int v)
+{
+    this->potatoes += v;
 }

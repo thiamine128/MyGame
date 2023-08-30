@@ -15,6 +15,7 @@ Window::Window() {
 
 }
 
+//初始化glfw窗口
 void Window::init(int width, int height, const char* title)
 {
     this->width = width;
@@ -71,6 +72,7 @@ int Window::getKey(int key) const {
     return glfwGetKey(this->window, key);
 }
 
+//窗口大小发生改变
 void Window::onResize(int width, int height)
 {
     this->width = width;
@@ -105,6 +107,7 @@ void Window::terminate()
     delete instance;
 }
 
+//窗口大小发生改变，进行一些数据更新
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
@@ -115,6 +118,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
     Game::getInstance()->getScreenManager()->handleResize(width, height);
 }
 
+//控制方面的监听
 void keyCallback(GLFWwindow* window, int key, int code, int action, int mods)
 {
     if (action == GLFW_PRESS)

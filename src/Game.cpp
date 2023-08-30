@@ -20,10 +20,12 @@
 
 Game* Game::instance = nullptr;
 
+//游戏逻辑的更新周期为0.05s
 Game::Game() : tickRate(0.05f) {
     
 }
 
+//准备渲染需要的资源
 void Game::initRendering()
 {
     if (!gladLoadGLLoader((GLADloadproc) glfwGetProcAddress)) {
@@ -32,12 +34,14 @@ void Game::initRendering()
     TextureManager::initAtlas();
 }
 
+//清理内存占用
 Game::~Game() {
     quitGame();
     delete this->renderer;
     delete this->controller;
 }
 
+//初始化
 void Game::init() {
     Window::getInstance()->init(800, 600, "My Game");
 
@@ -49,31 +53,30 @@ void Game::init() {
     ImGui_ImplGlfw_InitForOpenGL(Window::getInstance()->getWindow(), true);
     ImGui_ImplOpenGL3_Init("#version 330");
 
-
     initRendering();
     Item::init();
     
+    //创建渲染器，控制器以及各种管理器的对象
     renderer = new WorldRenderer();
-    
     controller = new Controller();
     currentFrame = this->lastFrame = this->deltaTime = 0.0f;
     gui = new GuiRenderer();
     screenManager = new ScreenManager(this->gui);
-
     ShaderManager::initUniforms(this->renderer, this->gui);
-    
     world = nullptr;
     screenManager->pushMenuScreen();
     paused = false;
-
     SoundManager::init();
 
     highestScore = readHighestScore();
 }
 
+//主循环
 void Game::run() {
     this->frameCnt = this->fps = 0;
     while (!Window::getInstance()->shouldClose()) {
+        //计算fps
+        //deltaTime用于每帧的插值
         this->currentFrame = static_cast<float>(glfwGetTime());
         this->deltaTime += currentFrame - lastFrame;
         this->lastFrame = currentFrame;
@@ -90,10 +93,11 @@ void Game::run() {
             this->frameCnt = 0;
         }
 
+        //处理输入
         this->controller->processInput();
-
         bool pushFail = false;
         
+        //游戏逻辑更新
         while (deltaTime > this->tickRate && this->world != nullptr && this->world->getPlayer()->getHealth() > 0) {
             deltaTime -= this->tickRate;
 
@@ -127,10 +131,22 @@ void Game::run() {
         }
         if (ImGui::Button("Spawn Entrance"))
         {
-                world->getRoom()->spawnEntity(3, 0, 0, 0);
+            world->getRoom()->spawnEntity(3, 0, 0, 0);
+        }
+        if (ImGui::Button("Quick Clear"))
+        {
+            auto ent = world->getRoom()->getEntities();
+            for (auto e : ent)
+            {
+                if (e->isEnemy())
+                {
+                    e->hurt(1000);
+                }
+            }
         }
         ImGui::End();
         
+        //渲染
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         this->screenManager->render();
@@ -145,6 +161,7 @@ void Game::run() {
             this->screenManager->pushFailedScreen();
         }
 
+        //FMOD更新
         SoundManager::update();
     }
 }
@@ -184,6 +201,7 @@ float Game::getFrameTime() const
     return this->currentFrame;
 }
 
+//创建新的游戏
 void Game::newGame()
 {
     this->paused = false;
@@ -195,24 +213,28 @@ void Game::newGame()
     this->renderer->setWorld(this->world);
 }
 
+//创建新的游戏并打开游戏界面
 void Game::startNewGame()
 {
     this->newGame();
     this->screenManager->pushGameScreen();
 }
 
+//暂停
 void Game::pause()
 {
     this->paused = true;
     this->screenManager->pushPauseScreen();
 }
 
+//继续
 void Game::continueGame()
 {
     this->paused = false;
     this->screenManager->popScreen();
 }
 
+//退出当前游戏
 void Game::quitGame()
 {
     if (this->world != nullptr)
@@ -221,6 +243,7 @@ void Game::quitGame()
     }
 }
 
+//历史分数相关
 int Game::getHighestScore()
 {
     return highestScore;
@@ -256,6 +279,7 @@ Game* Game::getInstance() {
     return instance;
 }
 
+//销毁资源
 void Game::terminate()
 {
     Window::terminate();

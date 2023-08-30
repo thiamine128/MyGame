@@ -19,6 +19,7 @@ public:
     int getHealth();
     double getAtk() const;
     float getRange() const;
+    int getPotatoes() const;
     void setTripleShot();
     void addAtk(double);
     void addRange(float);
@@ -27,6 +28,8 @@ public:
     void hurt(double);
     void heal();
     void addHeart(int);
+    void placeMine();
+    void gainPotato(int);
 protected:
     int shotCooldown;
     int immuneTicks;
@@ -35,5 +38,6 @@ protected:
     double atk;
     int hearts;
     float range;
+    int potatoes;
     std::vector<Item*> items;
 };

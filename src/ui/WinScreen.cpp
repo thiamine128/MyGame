@@ -19,7 +19,7 @@ void WinScreen::render() const
     std::string rec = ((Game::getInstance()->getWorld()->newRec) ? "(Record)" : "");
     this->guiRenderer->renderTextCentered(w / 2, h / 2, 2.0, "You Win!");
     this->guiRenderer->renderTextCentered(w / 2, h / 3, 1.0, "Score" + rec +  ":" + std::to_string(Game::getInstance()->getWorld()->getScore()));
-    this->guiRenderer->renderTextCentered(w / 2, h / 4, 1.0, "Press Space to Conrinue");
+    this->guiRenderer->renderTextCentered(w / 2, h / 4, 1.0, "Press Space to Continue");
     glEnable(GL_DEPTH_TEST);
 }
 

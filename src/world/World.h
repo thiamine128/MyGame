@@ -37,4 +37,5 @@ protected:
     int score;
     int scoreTick;
     bool prepareNext;
+    bool finished;
 };

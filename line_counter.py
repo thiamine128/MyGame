@@ -11,17 +11,17 @@ def findCpps(path):
     lis = []
     for root, dir, files in os.walk(path):
         for file in files:
-            if file.endswith(".cpp") and not "imgui" in file and (not "rendering" in root):
+            if file.endswith(".cpp") and not "imgui" in file:
                 lis.append(root + "\\" + file)
     return lis
 
 def lineCount(path):
     count = 0
-    with open(path) as fp:
-        for count, line in enumerate(fp):
-            pass
-    print(path, count + 1)
-    return count + 1
+    with open(path, encoding='utf-8') as fp:
+        for line in fp:
+            count = count + 1
+    print(path, count)
+    return count
 
 files = findCpps("src")
 tot = 0

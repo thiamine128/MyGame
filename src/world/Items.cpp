@@ -37,6 +37,7 @@ std::string const &Item::getName() const
     return this->name;
 }
 
+//拾取道具
 void Item::onPickup(Item* item, Player* player)
 {
     if (item == torchwood)
@@ -71,6 +72,7 @@ void Item::onPickup(Item* item, Player* player)
     player->getWorld()->addScore(1000);
 }
 
+//初始化道具
 void Item::init()
 {
     m[1] = torchwood = new Item("Torchwood", "assets/models/torchwood.obj", {"Explosive pea", "Damage up"});

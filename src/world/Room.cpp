@@ -4,6 +4,16 @@
 #include "ModelManager.h"
 #include "entity/Enemy.h"
 #include "World.h"
+#include "entity/Zombie.h"
+#include "entity/ZombieShooter.h"
+#include "entity/ItemEntity.h"
+#include "entity/HeartEntity.h"
+#include "entity/EntranceEntity.h"
+#include "entity/StoneShooter.h"
+#include "entity/PotatoMine.h"
+#include "entity/BabyPlum.h"
+#include "entity/SlimeBoss.h"
+#include "entity/Dragon.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -16,6 +26,7 @@
 int Room::dx[4] = {-1, 0, 0, 1};
 int Room::dy[4] = {0, -1, 1, 0};
 
+//创建新房间，指定布局
 Room::Room(World* world, std::string const& layout, int stage, int roomFlag) : world(world), rng(rd()), heartDrop(0, 100), roomFlag(roomFlag)
 {
     this->aabbs.push_back({{-9.0f, 0.0f, -9.0f}, {9.0f, 0.0f, 9.0f}});
@@ -38,6 +49,7 @@ Room::~Room()
         delete e;
 }
 
+//房间内的渲染
 void Room::render(const Shader* shader)
 {
     glm::mat4 modelMatrix = glm::mat4(1.0f);
@@ -78,6 +90,7 @@ void Room::render(const Shader* shader)
     }
 }
 
+//房间内碰撞检测
 bool Room::checkCollision(AABB const& aabb) const
 {
     for (auto e : aabbs) {
@@ -101,6 +114,7 @@ bool Room::checkCollision(AABB const& aabb) const
     return false;
 }
 
+//得到aabb范围内的实体
 Entity* Room::hitEnermy(AABB const& aabb) const
 {
     for (auto e : entities)
@@ -113,6 +127,7 @@ Entity* Room::hitEnermy(AABB const& aabb) const
     return nullptr;
 }
 
+//房间逻辑更新
 void Room::tick()
 {
     bool hasEnermy = false;
@@ -177,6 +192,7 @@ int Room::getBlock(int x, int y) const
     return this->block[x + 7][y + 7];
 }
 
+//放置边界障碍物
 void Room::setup(std::string const& layout)
 {
     for (int i = -7; i <= 7; ++i)
@@ -196,6 +212,7 @@ void Room::setup(std::string const& layout)
     this->loadLayout(layout);
 }
 
+//加载模型
 void Room::setupModels(int stage)
 {
     switch (stage)
@@ -225,6 +242,7 @@ void Room::setupModels(int stage)
     }
 }
 
+//打开房间的连接口
 void Room::open(int dir)
 {
     door[dir] = 1;
@@ -241,6 +259,7 @@ void Room::setConnect(int dir, Room* room)
     this->next[dir] = room;
 }
 
+//获取范围内的所有实体
 void Room::getEnemiesWithin(std::vector<Entity*>& entities, AABB const& aabb)
 {
     for (auto e : this->entities)
@@ -252,6 +271,7 @@ void Room::getEnemiesWithin(std::vector<Entity*>& entities, AABB const& aabb)
     }
 }
 
+//加载布局
 void Room::loadLayout(std::string const& layout)
 {
     std::ifstream f;
@@ -283,6 +303,7 @@ void Room::loadLayout(std::string const& layout)
     }
 }
 
+//根据参数生成实体
 void Room::spawnEntity(int id, int ex, float x, float y)
 {
     switch (id)
@@ -318,11 +339,15 @@ void Room::spawnEntity(int id, int ex, float x, float y)
     case 8:
         this->addEntity(new StoneShooter(this->world, glm::vec3(x, 0.0, y), ex));
         break;
+    case 9:
+        this->addEntity(new PotatoMine(this->world, glm::vec3(x, 0.0, y)));
+        break;
     default:
         break;
     }
 }
 
+//清理房间事件
 void Room::onComplete()
 {
     world->addScore(1000);
@@ -351,6 +376,12 @@ void Room::onComplete()
         Player* player = world->getPlayer();
         auto pos = findSpace(floor(player->getPos().x), floor(player->getPos().y));
         this->spawnEntity(0, 0, pos.x + 0.5, pos.y + 0.5);
+    }
+
+    if (heartDrop(rng) < 30)
+    {
+        Player* player = world->getPlayer();
+        player->gainPotato(1);
     }
 }
 
@@ -429,4 +460,9 @@ glm::ivec2 Room::findSpace(int x, int y)
         }
     }
     return ret;
+}
+
+std::vector<Entity*> const& Room::getEntities()
+{
+    return this->entities;
 }

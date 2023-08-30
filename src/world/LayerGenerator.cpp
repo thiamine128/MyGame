@@ -8,6 +8,7 @@ Room* LayerGenerator::m[13][13];
 int LayerGenerator::dx[4] = {-1, 0, 0, 1};
 int LayerGenerator::dy[4] = {0, -1, 1, 0};
 
+//优先队列BFS生成地图
 Room *LayerGenerator::generateRooms(World* world, int num, int stage)
 {
     std::random_device rd;

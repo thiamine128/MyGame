@@ -5,6 +5,7 @@
 
 #include <iostream>
 
+//创建世界
 World::World()
 {
     this->player = new Player(this);
@@ -13,6 +14,7 @@ World::World()
     this->score = 10000;
     this->scoreTick = 20;
     this->newRec = false;
+    this->finished = false;
 }
 
 World::~World()
@@ -41,12 +43,13 @@ void World::setRoom(Room* room)
     this->room = room;
 }
 
+//世界逻辑更新
 void World::tick()
 {
     this->player->tick();
     this->room->tick();
 
-    if (this->scoreTick == 0)
+    if (this->scoreTick == 0 && !finished)
         this->score--, this->scoreTick = 20;
     else
         this->scoreTick--;
@@ -57,6 +60,7 @@ void World::tick()
     }
 }
 
+//进入下一层
 void World::nextStage()
 {
     this->stage++;
@@ -87,8 +91,10 @@ int World::getScore() const
     return this->score;
 }
 
+//退出游戏时资源释放
 void World::finish()
 {
+    this->finished = true;
     newRec =  Game::getInstance()->updateScore(score);
     Game::getInstance()->getScreenManager()->pushWinScreen();
 }

@@ -37,6 +37,7 @@ public:
     Item* getNearestItem() const;
     Entity* findNearestEnemy() const;
     glm::ivec2 findSpace(int, int);
+    std::vector<Entity*> const& getEntities();
 protected:
     int block[15][15];
     World* world;

@@ -25,6 +25,7 @@ void GameScreen::render() const
 
     int height = Window::getInstance()->getHeight();
     int healthSize = height / 20;
+    int potatoSize = height / 15;
 
     Player* player = Game::getInstance()->getWorld()->getPlayer();
     int hearts = player->getHearts();
@@ -37,6 +38,9 @@ void GameScreen::render() const
         else
             this->guiRenderer->renderImage(i * healthSize, height - healthSize, healthSize, healthSize, TextureManager::getTexture("assets/textures/health_empty.png"));
     }
+
+    this->guiRenderer->renderImage(0, height - healthSize - potatoSize, potatoSize, potatoSize, TextureManager::getTexture("assets/textures/potatomine.png"));
+    this->guiRenderer->renderText(potatoSize, height - healthSize - potatoSize, 1.0f, "x" + std::to_string(player->getPotatoes()));
 
     this->guiRenderer->renderTextCentered(Window::getInstance()->getWidth() / 2, height - 80, 1.0f, "Score: " + std::to_string(worldRenderer->getWorld()->getScore()));
     
@@ -65,6 +69,10 @@ void GameScreen::handleKeyPress(int key)
     if (key == GLFW_KEY_M)
     {
         shouldRenderMap = !shouldRenderMap;
+    }
+    if (key == GLFW_KEY_E)
+    {
+        Game::getInstance()->getWorld()->getPlayer()->placeMine();
     }
 }
 
