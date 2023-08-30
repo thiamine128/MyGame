@@ -16,6 +16,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
+#include <fstream>
 
 Game* Game::instance = nullptr;
 
@@ -66,6 +67,8 @@ void Game::init() {
     paused = false;
 
     SoundManager::init();
+
+    highestScore = readHighestScore();
 }
 
 void Game::run() {
@@ -105,6 +108,27 @@ void Game::run() {
 
         ImGui::Begin("Debug");
         ImGui::Text("FPS: %d", this->fps);
+        if (ImGui::Button("Spawn Items"))
+        {
+            if (world != nullptr)
+            {
+                world->getRoom()->spawnEntity(0, 1, 1.5, 1.5);
+                world->getRoom()->spawnEntity(0, 2, 1.5, 2.5);
+                world->getRoom()->spawnEntity(0, 3, 1.5, 3.5);
+                world->getRoom()->spawnEntity(0, 4, 2.5, 1.5);
+                world->getRoom()->spawnEntity(0, 5, 2.5, 2.5);
+                world->getRoom()->spawnEntity(0, 6, 2.5, 3.5);
+                world->getRoom()->spawnEntity(0, 7, 3.5, 1.5);
+                world->getRoom()->spawnEntity(0, 8, 3.5, 2.5);
+                world->getRoom()->spawnEntity(0, 9, 3.5, 3.5);
+                world->getRoom()->spawnEntity(0, 10, 4.5, 1.5);
+                world->getRoom()->spawnEntity(0, 11, 4.5, 2.5);
+            }
+        }
+        if (ImGui::Button("Spawn Entrance"))
+        {
+                world->getRoom()->spawnEntity(3, 0, 0, 0);
+        }
         ImGui::End();
         
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -195,6 +219,34 @@ void Game::quitGame()
     {
         delete this->world;
     }
+}
+
+int Game::getHighestScore()
+{
+    return highestScore;
+}
+
+int Game::readHighestScore()
+{
+    std::ifstream sf("score.txt");
+    int s = 0;
+    sf >> s;
+    sf.close();
+    return s;
+}
+
+bool Game::updateScore(int score)
+{
+    int highest = readHighestScore();
+    if (score > highest)
+    {
+        std::ofstream sf("score.txt");
+        sf << score;
+        sf.close();
+        highest = score;
+        return true;
+    }
+    return false;
 }
 
 Game* Game::getInstance() {

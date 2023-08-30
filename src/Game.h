@@ -28,6 +28,9 @@ public:
     void pause();
     void continueGame();
     void quitGame();
+    int getHighestScore();
+    int readHighestScore();
+    bool updateScore(int);
 
     static Game* getInstance();
     static void terminate();
@@ -41,6 +44,7 @@ protected:
     float fpsLastTime;
     int frameCnt;
     int fps;
+    int highestScore;
     bool paused;
     
     Game();

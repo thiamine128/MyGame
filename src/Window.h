@@ -7,6 +7,7 @@ void keyCallback(GLFWwindow*, int, int, int, int);
 void mouseButtonCallback(GLFWwindow*, int, int, int);
 void scrollCallback(GLFWwindow*, double, double);
 void cursorPosCallback(GLFWwindow*, double, double);
+
 class Window
 {
 public:

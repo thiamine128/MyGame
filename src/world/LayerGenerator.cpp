@@ -15,7 +15,7 @@ Room *LayerGenerator::generateRooms(World* world, int num, int stage)
     int roomCnt = 4;
     if (stage == 2)
     {
-        roomCnt = 2;
+        roomCnt = 3;
     } else if (stage == 3)
     {
         roomCnt = 2;

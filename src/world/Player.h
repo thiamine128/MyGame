@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Items.h"
-#include "Entity.h"
+#include "entity/Entity.h"
 #include "rendering/Model.h"
 #include "util/AABB.h"
 #include <glm/gtc/type_ptr.hpp>

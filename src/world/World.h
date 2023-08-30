@@ -26,6 +26,9 @@ public:
     void prepareNextStage();
     void addScore(int);
     int getScore() const;
+    void finish();
+
+    bool newRec;
 protected:
     Player* player;
     Room* room;

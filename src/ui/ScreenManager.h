@@ -17,6 +17,7 @@ public:
     void pushMenuScreen();
     void pushPauseScreen();
     void pushWinScreen();
+    void pushHelpScreen();
     void escape();
     void onCursorMove(double, double);
     bool inGameScreen() const;

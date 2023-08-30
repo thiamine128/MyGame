@@ -2,7 +2,7 @@
 
 #include "Game.h"
 #include "ModelManager.h"
-#include "Bullet.h"
+#include "entity/Bullet.h"
 #include "SoundManager.h"
 
 #include <GLFW/glfw3.h>

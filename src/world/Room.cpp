@@ -2,7 +2,7 @@
 
 #include "rendering/glhelper.h"
 #include "ModelManager.h"
-#include "Enemy.h"
+#include "entity/Enemy.h"
 #include "World.h"
 
 #include <glm/glm.hpp>
@@ -205,18 +205,21 @@ void Room::setupModels(int stage)
         this->blockModels[1] = ModelManager::getModel("assets/models/tree.obj");
         this->blockModels[2] = ModelManager::getModel("assets/models/rock.obj");
         this->blockModels[3] = ModelManager::getModel("assets/models/mushroom.obj");
+        this->blockModels[4] = ModelManager::getModel("assets/models/stoneshooterblock.obj");
         break;
     case 2:
         this->blockModels[0] = ModelManager::getModel("assets/models/cave.obj");
         this->blockModels[1] = ModelManager::getModel("assets/models/cavewall.obj");
         this->blockModels[2] = ModelManager::getModel("assets/models/rock.obj");
         this->blockModels[3] = ModelManager::getModel("assets/models/mushroom.obj");
+        this->blockModels[4] = ModelManager::getModel("assets/models/stoneshooterblock.obj");
         break;
     case 3:
         this->blockModels[0] = ModelManager::getModel("assets/models/street.obj");
         this->blockModels[1] = ModelManager::getModel("assets/models/cone.obj");
         this->blockModels[2] = ModelManager::getModel("assets/models/rock.obj");
         this->blockModels[3] = ModelManager::getModel("assets/models/mushroom.obj");
+        this->blockModels[4] = ModelManager::getModel("assets/models/stoneshooterblock.obj");
     default:
         break;
     }
@@ -311,6 +314,9 @@ void Room::spawnEntity(int id, int ex, float x, float y)
         break;
     case 7:
         this->addEntity(new Dragon(this->world, glm::vec3(x, 0.0, y)));
+        break;
+    case 8:
+        this->addEntity(new StoneShooter(this->world, glm::vec3(x, 0.0, y), ex));
         break;
     default:
         break;

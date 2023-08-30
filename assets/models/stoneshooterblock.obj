@@ -1,0 +1,15 @@
+# Made in Blockbench 4.8.2
+mtllib stoneshooterblock.mtl
+
+o plane
+v 0.0625 0 0.0625
+v 0.0625 0 -0.0625
+v -0.0625 0 0.0625
+v -0.0625 0 -0.0625
+vt 0.125 0.875
+vt 0.125 1
+vt 0 1
+vt 0 0.875
+vn 0 1 0
+usemtl m_cdb3d119-77db-3682-3fe6-0191ff0ccc9c
+f 1/1/1 2/2/1 4/3/1 3/4/1

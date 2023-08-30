@@ -29,6 +29,7 @@ public:
     static Item* shoes;
     static Item* kettle;
     static Item* fertilizer;
+    static Item* laserbean;
 protected:
     std::string name;
     std::string modelPath;

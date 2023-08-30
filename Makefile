@@ -52,7 +52,7 @@ endif
 INCLUDES	:= $(patsubst %,-I%, $(INCLUDEDIRS:%/=%))
 
 # define the C libs
-LIBS		:= $(patsubst %,-L%, $(LIBDIRS:%/=%)) -lglad -lglfw3dll -lassimp.dll -lfreetype -lfmod
+LIBS		:= $(patsubst %,-L%, $(LIBDIRS:%/=%)) -lglad -lglfw3dll -lminizip -lassimp -lfreetype -lfmod
 
 rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
 
@@ -64,12 +64,6 @@ OBJECTS     := $(patsubst $(SOURCEDIRS)/%.cpp, $(OBJDIRS)/%.o, $(SOURCES))
 
 # define the dependency output files
 DEPS		:= $(OBJECTS:.o=.d)
-
-#
-# The following part of the makefile is generic; it can be used to
-# build any executable just by changing the definitions above and by
-# deleting dependencies appended to the file from 'make depend'
-#
 
 OUTPUTMAIN	:= $(call FIXPATH,$(OUTPUT)/$(MAIN))
 

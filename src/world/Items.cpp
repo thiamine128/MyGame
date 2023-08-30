@@ -4,7 +4,7 @@
 #include "Player.h"
 
 Item* Item::m[128];
-int Item::itemNum = 10;
+int Item::itemNum = 11;
 Item* Item::torchwood = nullptr;
 Item* Item::ice = nullptr;
 Item* Item::arrow = nullptr;
@@ -15,6 +15,7 @@ Item* Item::branch = nullptr;
 Item* Item::shoes = nullptr;
 Item* Item::kettle = nullptr;
 Item* Item::fertilizer = nullptr;
+Item* Item::laserbean = nullptr;
 
 Item::Item(std::string const& name, std::string const& modelPath, std::vector<std::string> const& description) : name(name), modelPath(modelPath), description(description)
 {
@@ -62,6 +63,9 @@ void Item::onPickup(Item* item, Player* player)
     } else if (item == fertilizer)
     {
         player->addAtk(1);
+    } else if (item == laserbean)
+    {
+        player->addShootSpeed(128);
     }
 
     player->getWorld()->addScore(1000);
@@ -79,4 +83,5 @@ void Item::init()
     m[8] = shoes = new Item("Shoes", "assets/models/shoes.obj", {"Speed up"});
     m[9] = kettle = new Item("Kettle", "assets/models/kettle.obj", {"Health up"});
     m[10] = fertilizer = new Item("Fertilizer", "assets/models/fertilizer.obj", {"Pea size up", "Damage up"});
+    m[11] = laserbean = new Item("Laser Bean", "assets/models/laserbean.obj", {"Laser pea"});
 }

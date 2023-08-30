@@ -1,7 +1,7 @@
 #pragma once
 
 #include "rendering/Model.h"
-#include "world/Entity.h"
+#include "entity/Entity.h"
 
 #include <vector>
 #include <random>

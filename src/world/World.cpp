@@ -12,6 +12,7 @@ World::World()
     this->nextStage();
     this->score = 10000;
     this->scoreTick = 20;
+    this->newRec = false;
 }
 
 World::~World()
@@ -84,4 +85,10 @@ void World::addScore(int v)
 int World::getScore() const
 {
     return this->score;
+}
+
+void World::finish()
+{
+    newRec =  Game::getInstance()->updateScore(score);
+    Game::getInstance()->getScreenManager()->pushWinScreen();
 }
